@@ -172,4 +172,4 @@ elif st.session_state.stage == 7:
             st.warning("다시 생각해줘...🥺")
 
 # ================= 하단 =================
-st.markdown('<div class="center small">Made with ❤️</div>', unsafe_allow_html=True)
+st.markdown('<div class="center small">Made with CHUNG YOUNG 👁️</div>', unsafe_allow_html=True)
