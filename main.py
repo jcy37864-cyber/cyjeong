@@ -119,11 +119,11 @@ elif st.session_state.stage == 5:
     heart_pos = random.randint(0, 2)
 
     for i in range(3):
-    with cols[i]:
-        if i == heart_pos:
-            if st.button("💖", key=f"heart_{i}"):
-                st.session_state.heart += 1
-        else:
+        with cols[i]:
+            if i == heart_pos:
+                if st.button("💖", key=f"heart_{i}"):
+                    st.session_state.heart += 1
+         else:
             if st.button("🖤", key=f"fake_{i}"):
                 st.warning("이건 아니야 😆")
 
