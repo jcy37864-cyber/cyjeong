@@ -68,7 +68,7 @@ elif st.session_state.stage == 1:
 # ================= 2단계 (생존 게임) =================
 elif st.session_state.stage == 2:
     st.markdown('<div class="center big">자 생존 게임을 시작하겠다.</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center">쥐덧 중 하나만이 안전하다. 눌러!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">3개의 쥐덧 중 하나만이 안전하다. 눌러!</div>', unsafe_allow_html=True)
 
     cols = st.columns(3)
     safe = random.randint(0, 2)
@@ -94,7 +94,7 @@ elif st.session_state.stage == 3:
     st.markdown('<div class="center">당신은 "정충용" 나를 믿고있어?</div>', unsafe_allow_html=True)
     ans = st.radio("", ["믿는다", "못 믿는다"])
 
-    if st.button("우하하하하하하하하"):
+    if st.button("우하하하하하하하하 후회할걸...."):
         st.session_state.stage = 4
 
 # ================= 4단계 (반전 연출) =================
