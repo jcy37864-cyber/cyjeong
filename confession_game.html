@@ -4,87 +4,748 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💀 SCARE — 소연에게</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{background:#080808;color:#ff2222;font-family:sans-serif;text-align:center;padding:20px;}
-button{padding:10px 20px;margin:10px;font-size:18px;cursor:pointer;}
+:root {
+  --h-bg:#080808;--h-text:#ff2222;--h-dim:#991111;
+  --l-bg:#fff5f7;--l-text:#c0194a;--l-accent:#ff4b7b;
+  --font-main:'Black Han Sans',sans-serif;--font-body:'Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;min-height:100vh;}
+body{font-family:var(--font-body);background:var(--h-bg);color:var(--h-text);
+  min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+  transition:background 1s ease,color 1s ease;overflow-x:hidden;}
+body.love-mode{background:var(--l-bg);color:var(--l-text);}
+#game{width:100%;max-width:580px;padding:2rem 1.5rem 4rem;min-height:100vh;
+  display:flex;flex-direction:column;gap:1.4rem;}
+
+/* stages */
+.stage{display:none;flex-direction:column;gap:1.3rem;animation:fadeIn .45s ease;}
+.stage.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* typography */
+.title-horror{font-family:var(--font-main);font-size:clamp(1.8rem,7vw,2.8rem);
+  color:var(--h-text);text-align:center;letter-spacing:.05em;
+  text-shadow:0 0 30px rgba(255,34,34,.55);animation:flicker 3s infinite;}
+.title-love{font-family:var(--font-main);font-size:clamp(1.6rem,6vw,2.4rem);
+  color:var(--l-accent);text-align:center;letter-spacing:.03em;}
+.subtitle{font-size:1rem;text-align:center;opacity:.82;line-height:1.7;}
+
+/* buttons */
+.btn{width:100%;padding:.95rem 1.3rem;font-family:var(--font-main);
+  font-size:1.1rem;letter-spacing:.04em;border-radius:10px;cursor:pointer;
+  transition:all .16s ease;}
+.btn-horror{background:#0f0f0f;color:var(--h-text);border:2px solid var(--h-dim);}
+.btn-horror:hover{background:#1a0000;border-color:var(--h-text);transform:scale(1.02);box-shadow:0 0 18px rgba(255,34,34,.3);}
+.btn-horror:active{transform:scale(.97);}
+.btn-horror:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.btn-love{background:#fff0f3;color:var(--l-text);border:2px solid var(--l-accent);}
+.btn-love:hover{background:#ffe0e8;transform:scale(1.02);box-shadow:0 4px 18px rgba(255,75,123,.22);}
+.btn-love:active{transform:scale(.97);}
+
+/* progress */
+.prog-wrap{background:#1a0000;border-radius:99px;height:13px;overflow:hidden;border:1px solid #330000;}
+.prog-bar{height:100%;background:linear-gradient(90deg,#ff0000,#ff6644);border-radius:99px;transition:width .35s ease;}
+.prog-wrap.love{background:#ffe0e8;border-color:#ffc0cc;}
+.prog-wrap.love .prog-bar{background:linear-gradient(90deg,#ff4b7b,#ff90b0);}
+
+/* status boxes */
+.sbox{border:2px solid var(--h-dim);background:#0a0000;border-radius:10px;
+  padding:1rem 1.2rem;font-size:1rem;font-weight:700;text-align:center;line-height:1.6;transition:all .3s;}
+.sbox.ok{border-color:#22dd22;color:#22dd22;}
+.sbox.bad{border-color:#ff4444;color:#ff4444;}
+.sbox.love{border-color:var(--l-accent);background:#fff0f3;color:var(--l-text);}
+
+/* images */
+.img-box{width:100%;border-radius:12px;overflow:hidden;border:3px solid #220000;background:#111;}
+.img-box img{width:100%;display:block;object-fit:cover;max-height:300px;}
+.img-ph{width:100%;height:180px;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.4rem;color:#444;font-size:.82rem;text-align:center;padding:1rem;}
+.img-ph .ic{font-size:2.2rem;}
+.img-box.love-frame{border-color:var(--l-accent);}
+
+/* loading */
+.load-bar-outer{background:#111;border-radius:99px;height:18px;overflow:hidden;border:1px solid #330000;}
+.load-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#660000,#ff0000);border-radius:99px;transition:width .08s linear;}
+.load-msg{font-size:.88rem;color:#666;text-align:center;min-height:1.2em;}
+
+/* shake / flicker */
+.shake{display:inline-block;animation:shake .32s infinite;font-family:var(--font-main);
+  font-size:clamp(1.5rem,5.5vw,2rem);color:var(--h-text);text-shadow:0 0 18px rgba(255,0,0,.6);text-align:center;}
+@keyframes shake{
+  0%{transform:translate(3px,2px) rotate(-.5deg)}25%{transform:translate(-4px,-2px) rotate(.5deg)}
+  50%{transform:translate(4px,-3px) rotate(-.3deg)}75%{transform:translate(-3px,3px) rotate(.4deg)}
+  100%{transform:translate(3px,-2px) rotate(-.2deg)}}
+@keyframes flicker{0%,90%,100%{opacity:1}91%{opacity:.5}93%{opacity:1}95%{opacity:.25}97%{opacity:1}}
+
+/* flash overlay */
+.flash-overlay{position:fixed;inset:0;background:#ff0000;opacity:0;pointer-events:none;z-index:9000;transition:opacity .05s;}
+
+/* balloons */
+#balloon-wrap{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden;}
+.balloon{position:absolute;bottom:-60px;animation:rise linear forwards;}
+@keyframes rise{to{transform:translateY(-110vh) rotate(20deg);opacity:0;}}
+
+/* audio notice */
+#audio-notice{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);
+  border-radius:99px;padding:.4rem 1.1rem;font-size:.78rem;color:#777;
+  pointer-events:none;transition:opacity .5s;z-index:100;}
+
+/* ── STAGE 1: DASH ── */
+#stamina-wrap{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.stamina-block{width:26px;height:26px;border-radius:5px;background:#1a0000;border:1px solid #330000;transition:background .2s;}
+.stamina-block.alive{background:#ff2200;border-color:#ff4400;box-shadow:0 0 6px rgba(255,34,0,.4);}
+.dist-big{font-family:var(--font-main);font-size:2.2rem;text-align:center;color:#ff2222;}
+#dist-delta{font-size:.9rem;color:#ff6644;text-align:center;min-height:1.2em;}
+#dash-timer-wrap{text-align:center;}
+.countdown-ring{font-family:var(--font-main);font-size:3.5rem;color:#ff2222;line-height:1;}
+#dash-timer-label{font-size:.8rem;color:#555;margin-top:-.3rem;}
+
+/* ── STAGE 2: SHADOW DOORS ── */
+.door-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.door-card{aspect-ratio:.55/1;border-radius:10px 10px 3px 3px;border:2px solid #2a0000;
+  background:#0a0000;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;padding-bottom:.6rem;
+  transition:all .18s;font-family:var(--font-main);font-size:.8rem;color:#440000;}
+.door-card:hover{border-color:#ff2222;background:#150000;transform:translateY(-4px);box-shadow:0 0 14px rgba(255,0,0,.25);}
+.door-card.correct{border-color:#22dd22!important;background:#001500!important;animation:dPulse .4s ease;}
+.door-card.wrong{animation:dWrong .35s ease;}
+.door-card .di{font-size:1.8rem;margin-bottom:.2rem;}
+@keyframes dPulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes dWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.shadow-creature{font-size:3rem;text-align:center;animation:cFloat 2s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(255,0,0,.6));}
+@keyframes cFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#door-hp-wrap{display:flex;gap:6px;justify-content:center;}
+.hp-heart{font-size:1.3rem;transition:filter .3s;}
+.hp-heart.lost{filter:grayscale(1) opacity(.3);}
+#door-streak-box{text-align:center;font-size:.95rem;font-weight:700;color:#ff6644;}
+
+/* ── STAGE 2.5: ROULETTE ── */
+#roulette-canvas-wrap{display:flex;justify-content:center;position:relative;}
+#roulette-canvas{border-radius:50%;display:block;filter:drop-shadow(0 0 16px rgba(255,0,0,.4));}
+#roulette-needle{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
+  border-bottom:30px solid #ffff00;filter:drop-shadow(0 0 4px rgba(255,255,0,.8));z-index:10;}
+#spin-result-ring{width:110px;height:110px;border-radius:50%;border:4px solid #330000;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  margin:0 auto;transition:border-color .3s,background .3s;}
+
+/* ── STAGE 3: TRUST TYPING ── */
+#trust-phrase{font-family:var(--font-main);font-size:1.4rem;text-align:center;
+  color:#ff2222;letter-spacing:.1em;line-height:1.8;}
+#trust-input{width:100%;padding:.9rem 1rem;background:#0a0000;border:2px solid #440000;
+  border-radius:10px;color:#ff6644;font-family:var(--font-main);font-size:1.2rem;
+  letter-spacing:.1em;text-align:center;outline:none;transition:border-color .2s;}
+#trust-input:focus{border-color:#ff2222;}
+#trust-progress-wrap{display:flex;gap:8px;justify-content:center;}
+.trust-dot{width:18px;height:18px;border-radius:50%;border:2px solid #440000;background:transparent;transition:all .3s;}
+.trust-dot.done{background:var(--h-text);border-color:var(--h-text);box-shadow:0 0 8px rgba(255,0,0,.5);}
+#trust-msg{font-size:.9rem;text-align:center;color:#555;min-height:1.2em;}
+#trust-err-msg{font-size:.88rem;text-align:center;color:#ff4444;min-height:1.2em;}
+
+/* ── STAGE 5: HEART GRID ── */
+.heart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.heart-cell{aspect-ratio:1;border-radius:10px;border:2px solid #ffc0cc;background:#fff5f7;
+  display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+  cursor:pointer;transition:all .18s;}
+.heart-cell:hover{transform:scale(1.08);}
+.heart-cell.glow{animation:hPop .3s ease;}
+@keyframes hPop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+#heart-num-big{font-family:var(--font-main);font-size:2.5rem;text-align:center;color:var(--l-accent);}
+
+/* ── STAGE 6: RED THREAD ── */
+#thread-arena{position:relative;width:100%;height:360px;background:#030010;
+  border-radius:14px;border:2px solid #1a0030;overflow:hidden;}
+.thread-item{position:absolute;cursor:pointer;user-select:none;font-size:clamp(1.5rem,4vw,2.1rem);
+  filter:drop-shadow(0 0 5px rgba(200,0,255,.5));animation:tFloat linear infinite;}
+.thread-item:hover{transform:scale(1.18)!important;}
+@keyframes tFloat{0%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}100%{transform:translateY(0) rotate(-3deg)}}
+.thread-real{filter:drop-shadow(0 0 8px rgba(255,0,180,.8))!important;animation:rPulse 1.2s ease infinite!important;}
+@keyframes rPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(255,0,180,.6))}50%{filter:drop-shadow(0 0 20px rgba(255,0,200,1));}}
+#thread-hint{font-size:.9rem;text-align:center;color:#554455;min-height:1.3em;}
+#thread-attempts{text-align:center;font-size:.9rem;color:#772222;font-weight:700;}
+.thread-spark{position:absolute;pointer-events:none;z-index:10;font-size:1.5rem;
+  animation:sBurst .65s ease forwards;}
+@keyframes sBurst{0%{opacity:1;transform:scale(.4) translate(0,0)}100%{opacity:0;transform:scale(2) translate(var(--dx),var(--dy))}}
+
+/* ── STAGE 7: PROPOSAL ── */
+#proposal-arena{position:relative;height:160px;overflow:hidden;}
+#no-btn{position:absolute;width:38%;transition:top .12s ease,left .12s ease;}
+#no-escape-msg{font-size:.85rem;text-align:center;color:#553333;min-height:1.2em;}
+
+/* ending */
+.ending-text{font-family:var(--font-main);font-size:1.3rem;text-align:center;color:var(--l-accent);line-height:1.8;}
 </style>
 </head>
-
 <body>
+<div id="game">
 
-<h1>💀 게임 시작</h1>
-
-<div id="stage1">
-<h2>🏃 달리기</h2>
-<p id="dist">200</p>
-<button onclick="run()">달려!</button>
+<!-- S0: 로딩 -->
+<div class="stage active" id="s0">
+  <div class="title-horror" style="font-size:clamp(1.4rem,5vw,2.1rem)">👁️ SYSTEM BREACH IN PROGRESS</div>
+  <div class="subtitle" style="color:#3a3a3a">소연이의 데이터에 강제 침투 중...</div>
+  <div id="load-wrap" style="display:none;flex-direction:column;gap:1rem;">
+    <div class="load-bar-outer"><div class="load-bar-inner" id="load-bar"></div></div>
+    <div class="load-msg" id="load-msg">대기 중...</div>
+  </div>
+  <button class="btn btn-horror" id="btn-s0-start">🩸 권한 강제 탈취 (이소연)</button>
+  <button class="btn btn-horror" id="btn-s0-enter" style="display:none">💀 어둠의 심연으로 입장</button>
+  <p style="font-size:.75rem;color:#2a2a2a;text-align:center">※ 소리는 클릭 후 켜집니다</p>
 </div>
 
-<div id="stage2" style="display:none">
-<h2>🚪 문 선택</h2>
-<p>연속 성공: <span id="streak">0</span> / 2</p>
-<button onclick="door()">문 선택</button>
+<!-- S1: 달리기 -->
+<div class="stage" id="s1">
+  <div class="shake" id="shake-text">🔪 소연아!! 뒤를 봐!! 🔪</div>
+  <div class="img-box" id="img-scary"><div class="img-ph"><div class="ic">👁️</div><div>scary.jpg</div></div></div>
+  <div class="dist-big">🏃 <span id="dist-num">200</span>m</div>
+  <div id="dist-delta">&nbsp;</div>
+  <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
+  <div id="dash-timer-wrap" style="display:none">
+    <div class="countdown-ring" id="dash-timer">4</div>
+    <div id="dash-timer-label">이 안에 클릭 안 하면 거리 증가!!</div>
+  </div>
+  <div id="stamina-wrap"></div>
+  <button class="btn btn-horror" id="btn-run" style="font-size:1.5rem;padding:1.2rem">🏃 달려!! 달려!! (클릭!)</button>
+  <button class="btn btn-horror" id="btn-escape-room" style="display:none">🚪 탈출구로 질주!!</button>
 </div>
 
-<div id="stage3" style="display:none">
-<h2>🎰 룰렛</h2>
-<p>연속 성공: <span id="combo">0</span> / 3</p>
-<button onclick="roulette()">돌려!</button>
+<!-- S2: 그림자 문 -->
+<div class="stage" id="s2">
+  <div class="title-horror" style="font-size:1.45rem">🚪 그림자 뒤의 진실</div>
+  <div class="shadow-creature" id="shadow-creature">👾</div>
+  <div id="door-streak-box">연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">4</span>연속</div>
+  <div id="door-hp-wrap">
+    <span class="hp-heart" id="hp0">❤️</span>
+    <span class="hp-heart" id="hp1">❤️</span>
+    <span class="hp-heart" id="hp2">❤️</span>
+  </div>
+  <div class="door-grid" id="door-grid"></div>
+  <div class="sbox bad" id="door-dead-box" style="display:none">💀 그림자에게 삼켜졌다...</div>
+  <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 다시 일어서</button>
+  <button class="btn btn-horror" id="btn-door-next" style="display:none">🔦 탈출구로!!</button>
 </div>
+
+<!-- S2.5: 룰렛 -->
+<div class="stage" id="s25">
+  <div class="shake" style="font-size:1.8rem">💀 죽음의 룰렛 💀</div>
+  <div class="subtitle">2연속 통과해야 탈출!</div>
+  <div id="roulette-canvas-wrap">
+    <canvas id="roulette-canvas" width="260" height="260"></canvas>
+    <div id="roulette-needle"></div>
+  </div>
+  <div id="spin-result-ring">❓</div>
+  <div id="roulette-status" class="sbox" style="display:none"></div>
+  <div style="text-align:center;font-size:1rem;color:#ff6644;font-weight:700">연속 통과: <span id="combo-num">0</span> / 2</div>
+  <button class="btn btn-horror" id="roulette-spin-btn">🎰 룰렛을 돌려라!</button>
+  <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 틈으로 기어나가기</button>
+</div>
+
+<!-- S3: 믿음 타이핑 -->
+<div class="stage" id="s3">
+  <div class="title-horror" style="font-size:1.35rem">소연아, 날 진짜 믿는다면...</div>
+  <div class="subtitle" style="color:#553333">아래 문장을 정확히 입력해봐</div>
+  <div id="trust-phrase"></div>
+  <input id="trust-input" type="text" autocomplete="off" spellcheck="false" placeholder="여기에 입력...">
+  <div id="trust-progress-wrap">
+    <div class="trust-dot" id="td0"></div>
+    <div class="trust-dot" id="td1"></div>
+    <div class="trust-dot" id="td2"></div>
+  </div>
+  <div id="trust-msg">1 / 3 완료</div>
+  <div id="trust-err-msg">&nbsp;</div>
+</div>
+
+<!-- S4: 반전 고백 -->
+<div class="stage" id="s4">
+  <div class="title-love">🌹 서프라이즈! 소연아! 🌹</div>
+  <div class="img-box love-frame" id="img-cute"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">🌸</div><div>cute.jpg</div></div></div>
+  <button class="btn btn-love" id="btn-to-heart">💖 나의 진심을 확인할래?</button>
+</div>
+
+<!-- S5: 하트 그리드 -->
+<div class="stage" id="s5">
+  <div class="title-love" style="font-size:1.5rem">내 마음을 받아줘! 💖</div>
+  <div id="heart-num-big"><span id="heart-num">0</span> / 12</div>
+  <div class="prog-wrap love"><div class="prog-bar" id="heart-bar" style="width:0%"></div></div>
+  <div class="heart-grid" id="heart-grid"></div>
+  <button class="btn btn-love" id="btn-to-thread" style="display:none">🧵 운명의 붉은 실을 찾아...</button>
+</div>
+
+<!-- S6: 붉은 실 -->
+<div class="stage" id="s6">
+  <div class="title-horror" style="font-size:1.45rem;color:#dd00bb;text-shadow:0 0 20px rgba(220,0,180,.5)">🧵 운명의 붉은 실</div>
+  <div class="subtitle" style="color:#553355">진짜 실 하나가 우리를 이어줘.<br>하지만 가짜도 있어... 조심해.</div>
+  <div id="thread-arena"></div>
+  <div id="thread-hint">&nbsp;</div>
+  <div id="thread-attempts">남은 기회: <span id="thread-tries">5</span></div>
+  <button class="btn btn-horror" id="btn-thread-retry" style="display:none">🩸 다시 도전</button>
+  <button class="btn btn-horror" id="btn-thread-next" style="display:none">💌 마지막 고백으로...</button>
+</div>
+
+<!-- S7: 프로포즈 -->
+<div class="stage" id="s7">
+  <div class="title-love">소연아, 영원히 나랑 함께해줄래?</div>
+  <div id="proposal-arena">
+    <button class="btn btn-love" id="yes-btn" style="position:absolute;width:52%;top:50%;left:8%;transform:translateY(-50%)">✨ 100% YES! ✨</button>
+    <button class="btn btn-horror" id="no-btn">NO</button>
+  </div>
+  <div id="no-escape-msg">&nbsp;</div>
+</div>
+
+<!-- S8: 엔딩 -->
+<div class="stage" id="s8">
+  <div class="title-love">🎉 우리의 새로운 시작! 🎉</div>
+  <div class="img-box love-frame" id="img-final"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">💑</div><div>final.jpg</div></div></div>
+  <div class="ending-text">이 모든 공포를 뚫고도<br>여기까지 왔어. 수고했어, 소연아 💖</div>
+  <div class="sbox love">우리의 이야기가 시작됐어! 🌹</div>
+  <button class="btn btn-love" id="btn-restart">처음으로 돌아가기</button>
+</div>
+
+</div>
+
+<audio id="aud-scary" loop preload="auto"><source src="bgm_scary.mp3" type="audio/mpeg"></audio>
+<audio id="aud-love"  loop preload="auto"><source src="bgm_love.mp3"  type="audio/mpeg"></audio>
+<div id="balloon-wrap"></div>
+<div class="flash-overlay" id="flash"></div>
+<div id="audio-notice">🔇 아무 곳이나 클릭하면 소리가 켜져요</div>
 
 <script>
-let dist=200;
-let streak=0;
-let combo=0;
+/* ═══════════════════ STATE ═══════════════════ */
+const S = {
+  audioUnlocked:false, currentAudio:null,
+  dist:200, maxDist:200, stamina:5,
+  dashTimerVal:0, dashTI:null,
+  doorStreak:0, doorHP:3,
+  rCombo:0, rSpinning:false,
+  trustDone:0, trustIdx:0,
+  heartCount:0,
+  threadTries:5, threadFound:false, threadLocked:false,
+  noEscapes:0,
+};
 
-/* ===== 달리기 ===== */
-function run(){
-  let decrease = 10 + Math.floor(Math.random()*8); // 🔥 덜 줄어듦
-  dist -= decrease;
+/* ═══════════════════ AUDIO ═══════════════════ */
+const audS=document.getElementById('aud-scary'),audL=document.getElementById('aud-love');
+audS.volume=.45; audL.volume=.5;
+function unlockAudio(){
+  if(S.audioUnlocked)return; S.audioUnlocked=true;
+  document.getElementById('audio-notice').style.opacity='0';
+  if(S.currentAudio) S.currentAudio.play().catch(()=>{});
+}
+document.addEventListener('click',unlockAudio,{once:true});
+function switchAudio(t){
+  if(t==='scary'){if(!audS.paused)return;audL.pause();S.currentAudio=audS;if(S.audioUnlocked)audS.play().catch(()=>{});}
+  else{if(!audL.paused)return;audS.pause();S.currentAudio=audL;if(S.audioUnlocked)audL.play().catch(()=>{});}
+}
 
-  let penalty = 25 + Math.floor(Math.random()*30); // 🔥 더 쫓김
-  dist += Math.random()<0.3 ? penalty : 0;
-
-  document.getElementById("dist").innerText=dist;
-
-  if(dist<=0){
-    document.getElementById("stage1").style.display="none";
-    document.getElementById("stage2").style.display="block";
+/* ═══════════════════ UTILS ═══════════════════ */
+function goStage(id){
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(['s4','s5','s6','s7','s8'].includes(id)){document.body.classList.add('love-mode');switchAudio('love');}
+  else if(id!=='s0'){document.body.classList.remove('love-mode');switchAudio('scary');}
+}
+function tryLoadImg(id,src){
+  const w=document.getElementById(id);if(!w)return;
+  const i=new Image();i.onload=()=>{w.innerHTML=`<img src="${src}" alt="">`;};i.src=src;
+}
+function flashScreen(col,dur){
+  const f=document.getElementById('flash');f.style.background=col||'#ff0000';f.style.opacity='.5';
+  setTimeout(()=>f.style.opacity='0',dur||120);
+}
+function launchBalloons(){
+  const w=document.getElementById('balloon-wrap');
+  const em=['🎈','💖','🌹','✨','💕','🎉','🫀','🌸'];
+  for(let i=0;i<22;i++){
+    const b=document.createElement('div');b.className='balloon';
+    b.textContent=em[Math.floor(Math.random()*em.length)];
+    b.style.left=Math.random()*100+'vw';
+    b.style.animationDuration=(2.2+Math.random()*3)+'s';
+    b.style.animationDelay=(Math.random()*1.8)+'s';
+    b.style.fontSize=(1.3+Math.random()*1.6)+'rem';
+    w.appendChild(b); b.addEventListener('animationend',()=>b.remove());
   }
 }
 
-/* ===== 문짝 ===== */
-function door(){
-  if(Math.random()<0.5){
-    streak++;
-  }else{
-    streak=0;
-  }
+/* ═══════════════════ S0: LOADING ═══════════════════ */
+let loadDone=false;
+document.getElementById('btn-s0-start').addEventListener('click',function(){
+  if(loadDone)return;
+  this.disabled=true;this.style.opacity='.35';
+  document.getElementById('load-wrap').style.display='flex';
+  const bar=document.getElementById('load-bar'),msg=document.getElementById('load-msg');
+  const msgs=['영혼의 주파수 맞추는 중...','어둠의 경로 탐색 중...','보안 필터 파괴 중...','이소연 데이터 복원 중...','성공.'];
+  let p=0;
+  const iv=setInterval(()=>{
+    p=Math.min(p+1,100);bar.style.width=p+'%';
+    msg.textContent=msgs[Math.min(Math.floor(p/20),msgs.length-1)];
+    if(p>=100){clearInterval(iv);loadDone=true;document.getElementById('btn-s0-enter').style.display='block';}
+  },80);
+});
+document.getElementById('btn-s0-enter').addEventListener('click',()=>{tryLoadImg('img-scary','scary.jpg');initDash();goStage('s1');});
 
-  document.getElementById("streak").innerText=streak;
-
-  if(streak>=2){ // 🔥 4 → 2
-    document.getElementById("stage2").style.display="none";
-    document.getElementById("stage3").style.display="block";
+/* ═══════════════════ S1: DASH ═══════════════════ */
+function initDash(){
+  S.dist=200;S.maxDist=200;S.stamina=5;
+  clearInterval(S.dashTI);
+  document.getElementById('dist-num').textContent=200;
+  document.getElementById('dist-bar').style.width='100%';
+  document.getElementById('dist-delta').textContent='\u00a0';
+  document.getElementById('btn-run').style.display='block';
+  document.getElementById('btn-escape-room').style.display='none';
+  document.getElementById('shake-text').textContent='🔪 소연아!! 뒤를 봐!! 🔪';
+  buildStamina();startDashTimer();
+}
+function buildStamina(){
+  const w=document.getElementById('stamina-wrap');w.innerHTML='';
+  for(let i=0;i<5;i++){
+    const b=document.createElement('div');b.className='stamina-block'+(i<S.stamina?' alive':'');
+    b.id='sb'+i;w.appendChild(b);
   }
 }
+function startDashTimer(){
+  clearInterval(S.dashTI);
+  S.dashTimerVal=4;
+  const tw=document.getElementById('dash-timer-wrap');tw.style.display='block';
+  const el=document.getElementById('dash-timer');el.textContent=S.dashTimerVal;
+  S.dashTI=setInterval(()=>{
+    S.dashTimerVal--;el.textContent=S.dashTimerVal;
+    if(S.dashTimerVal<=0){
+      clearInterval(S.dashTI);
+      const p=15+Math.floor(Math.random()*25);
+      S.dist=Math.min(S.dist+p,350);S.maxDist=Math.max(S.maxDist,S.dist);
+      document.getElementById('dist-num').textContent=S.dist;
+      document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
+      document.getElementById('dist-delta').textContent='⚠️ 너무 느려! +'+p+'m 거리 증가!';
+      flashScreen('#ff0000',200);
+      if(S.stamina>0){S.stamina--;const sb=document.getElementById('sb'+S.stamina);if(sb)sb.classList.remove('alive');}
+      if(S.stamina<=0){S.stamina=1;const sb=document.getElementById('sb0');if(sb)sb.classList.add('alive');}
+      startDashTimer();
+    }
+  },1000);
+}
+document.getElementById('btn-run').addEventListener('click',function(){
+  clearInterval(S.dashTI);
+  const r=15+Math.floor(Math.random()*12);
+  S.dist=Math.max(0,S.dist-r);
+  document.getElementById('dist-num').textContent=S.dist;
+  document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
+  document.getElementById('dist-delta').textContent='▼ -'+r+'m!';
+  if(S.dist<=0){
+    clearInterval(S.dashTI);
+    document.getElementById('dash-timer-wrap').style.display='none';
+    this.style.display='none';
+    document.getElementById('btn-escape-room').style.display='block';
+    document.getElementById('shake-text').textContent='🚪 탈출구가 보여!! 빨리!!';
+  } else {startDashTimer();}
+});
+document.getElementById('btn-escape-room').addEventListener('click',()=>{clearInterval(S.dashTI);initDoors();goStage('s2');});
 
-/* ===== 룰렛 ===== */
-function roulette(){
-  if(Math.random()<0.5){
-    combo++;
-  }else{
-    combo=0;
-  }
-
-  document.getElementById("combo").innerText=combo;
-
-  if(combo>=3){ // 🔥 2 → 3
-    alert("🎉 성공! 고백 완료!");
+/* ═══════════════════ S2: SHADOW DOORS ═══════════════════ */
+const CREATURES=['👾','🦷','💀','🕷️','🧟','👁️','🩸','🌑'];
+const DLABELS=['???','...','꽝?','>_<','운명','탈출','살길?'];
+function initDoors(){
+  S.doorStreak=0;S.doorHP=3;
+  document.getElementById('streak-num').textContent=0;
+  document.getElementById('door-dead-box').style.display='none';
+  document.getElementById('btn-retry-door').style.display='none';
+  document.getElementById('btn-door-next').style.display='none';
+  document.getElementById('door-grid').style.display='grid';
+  for(let i=0;i<3;i++){const h=document.getElementById('hp'+i);if(h){h.className='hp-heart';h.textContent='❤️';}}
+  buildDoors();rotateShadow();
+}
+function buildDoors(){
+  const g=document.getElementById('door-grid');g.innerHTML='';
+  const safeIdx=Math.floor(Math.random()*5);
+  for(let i=0;i<5;i++){
+    const d=document.createElement('div');d.className='door-card';
+    d.innerHTML=`<div class="di">🚪</div><div>${DLABELS[Math.floor(Math.random()*DLABELS.length)]}</div>`;
+    d.dataset.safe=(i===safeIdx)?'1':'0';
+    d.addEventListener('click',()=>onDoorClick(d));
+    g.appendChild(d);
   }
 }
+function rotateShadow(){document.getElementById('shadow-creature').textContent=CREATURES[Math.floor(Math.random()*CREATURES.length)];}
+function onDoorClick(d){
+  if(d.dataset.used==='1')return;d.dataset.used='1';
+  if(d.dataset.safe==='1'){
+    d.classList.add('correct');S.doorStreak++;
+    document.getElementById('streak-num').textContent=S.doorStreak;
+    rotateShadow();
+    if(S.doorStreak>=4){setTimeout(()=>{document.getElementById('door-grid').style.display='none';document.getElementById('btn-door-next').style.display='block';},500);}
+    else{setTimeout(buildDoors,600);}
+  } else {
+    d.classList.add('wrong');flashScreen('#ff0000',160);S.doorStreak=0;
+    document.getElementById('streak-num').textContent=0;
+    S.doorHP--;
+    if(S.doorHP>=0){const h=document.getElementById('hp'+S.doorHP);if(h){h.classList.add('lost');h.textContent='🖤';}}
+    if(S.doorHP<=0){
+      document.getElementById('door-grid').style.display='none';
+      document.getElementById('door-dead-box').style.display='block';
+      document.getElementById('btn-retry-door').style.display='block';
+    } else {setTimeout(buildDoors,600);}
+  }
+}
+document.getElementById('btn-retry-door').addEventListener('click',initDoors);
+document.getElementById('btn-door-next').addEventListener('click',()=>{document.getElementById('door-grid').style.display='grid';initRoulette();goStage('s25');});
+
+/* ═══════════════════ S2.5: ROULETTE ═══════════════════ */
+const RC=document.getElementById('roulette-canvas');
+const RCX=RC.getContext('2d');
+const RSEGS=['통과','꽝','통과','꽝','통과','꽝','통과','꽝'];
+const RCOLS=['#003300','#330000','#004400','#440000','#005500','#440000','#003300','#550000'];
+const RTCOLS=['#22ff44','#ff4444','#33ff55','#ff5555','#44ff66','#ff4444','#33ff44','#ff6655'];
+let rAngle=0;
+
+function drawWheel(a){
+  const cx=130,cy=130,r=120,n=RSEGS.length,sl=(2*Math.PI)/n,off=a*Math.PI/180;
+  RCX.clearRect(0,0,260,260);
+  for(let i=0;i<n;i++){
+    const st=off+i*sl;
+    RCX.beginPath();RCX.moveTo(cx,cy);RCX.arc(cx,cy,r,st,st+sl);RCX.closePath();
+    RCX.fillStyle=RCOLS[i];RCX.fill();RCX.strokeStyle='#1a1a1a';RCX.lineWidth=1.5;RCX.stroke();
+    RCX.save();RCX.translate(cx,cy);RCX.rotate(st+sl/2);
+    RCX.fillStyle=RTCOLS[i];RCX.font='bold 13px "Black Han Sans",sans-serif';
+    RCX.textAlign='center';RCX.textBaseline='middle';RCX.fillText(RSEGS[i],r*.65,0);RCX.restore();
+  }
+  RCX.beginPath();RCX.arc(cx,cy,16,0,2*Math.PI);
+  RCX.fillStyle='#0a0000';RCX.fill();RCX.strokeStyle='#ff2222';RCX.lineWidth=2;RCX.stroke();
+}
+
+function initRoulette(){
+  S.rCombo=0;S.rSpinning=false;
+  document.getElementById('combo-num').textContent=0;
+  document.getElementById('roulette-status').style.display='none';
+  const btn=document.getElementById('roulette-spin-btn');
+  btn.style.display='block';btn.disabled=false;btn.textContent='🎰 룰렛을 돌려라!';
+  document.getElementById('btn-to-trust').style.display='none';
+  document.getElementById('spin-result-ring').textContent='❓';
+  document.getElementById('spin-result-ring').style.borderColor='#330000';
+  document.getElementById('spin-result-ring').style.background='transparent';
+  drawWheel(0);
+}
+
+document.getElementById('roulette-spin-btn').addEventListener('click',function(){
+  if(S.rSpinning)return;
+  S.rSpinning=true;this.disabled=true;this.textContent='⏳ 돌아간다...';
+  const extra=(5+Math.floor(Math.random()*5))*360;
+  const stop=Math.floor(Math.random()*360);
+  const total=extra+stop;
+  const dur=3200;const t0=performance.now();const a0=rAngle;
+  const ease=t=>1-Math.pow(1-t,3);
+  const self=this;
+  (function anim(now){
+    const t=Math.min((now-t0)/dur,1);
+    rAngle=(a0+total*ease(t))%360;
+    drawWheel(rAngle);
+    if(t<1){requestAnimationFrame(anim);}
+    else{
+      const n=RSEGS.length,sl=360/n;
+      const needleAngle=(360-rAngle%360+270)%360;
+      const idx=Math.floor(needleAngle/sl)%n;
+      const pass=RSEGS[idx]==='통과';
+      const ring=document.getElementById('spin-result-ring');
+      const st=document.getElementById('roulette-status');
+      st.style.display='block';
+      if(pass){
+        S.rCombo++;document.getElementById('combo-num').textContent=S.rCombo;
+        ring.textContent='✅';ring.style.borderColor='#22dd22';ring.style.background='#002200';
+        st.className='sbox ok';st.textContent='🎉 '+S.rCombo+'회 통과! 한 번 더!';
+        if(S.rCombo>=2){
+          st.textContent='🔓 탈출 성공!! 빛이 보여!!';
+          self.style.display='none';document.getElementById('btn-to-trust').style.display='block';
+          S.rSpinning=false;return;
+        }
+      } else {
+        S.rCombo=0;document.getElementById('combo-num').textContent=0;
+        ring.textContent='💀';ring.style.borderColor='#ff4444';ring.style.background='#220000';
+        st.className='sbox bad';st.textContent='💀 [꽝] 처음부터 다시!';flashScreen('#ff0000',200);
+      }
+      setTimeout(()=>{S.rSpinning=false;self.disabled=false;self.textContent='🎰 룰렛을 돌려라!';},600);
+    }
+  })(performance.now());
+});
+
+document.getElementById('btn-to-trust').addEventListener('click',()=>{initTrust();goStage('s3');});
+
+/* ═══════════════════ S3: TRUST TYPING ═══════════════════ */
+const TPHRASES=['믿어','같이가자','영원히'];
+function initTrust(){
+  S.trustDone=0;S.trustIdx=0;
+  document.getElementById('trust-input').value='';
+  document.getElementById('trust-msg').textContent='1 / 3 완료';
+  document.getElementById('trust-err-msg').textContent='\u00a0';
+  for(let i=0;i<3;i++) document.getElementById('td'+i).className='trust-dot';
+  showTrustPhrase();
+}
+function showTrustPhrase(){
+  document.getElementById('trust-phrase').textContent='→ "'+TPHRASES[S.trustIdx]+'" 을 입력해봐';
+  document.getElementById('trust-input').value='';
+  document.getElementById('trust-input').focus();
+}
+document.getElementById('trust-input').addEventListener('input',function(){
+  const tgt=TPHRASES[S.trustIdx];
+  if(this.value===tgt){
+    document.getElementById('td'+S.trustDone).classList.add('done');
+    S.trustDone++;S.trustIdx++;
+    document.getElementById('trust-msg').textContent=S.trustDone+' / 3 완료';
+    document.getElementById('trust-err-msg').textContent='\u00a0';
+    if(S.trustDone>=3){setTimeout(()=>{launchBalloons();tryLoadImg('img-cute','cute.jpg');goStage('s4');},400);}
+    else{showTrustPhrase();}
+  } else if(!tgt.startsWith(this.value)){
+    document.getElementById('trust-err-msg').textContent='❌ 틀렸어! 다시 입력해봐';
+    flashScreen('#220000',100);this.value='';
+  }
+});
+
+document.getElementById('btn-to-heart').addEventListener('click',()=>{initHearts();goStage('s5');});
+
+/* ═══════════════════ S5: HEART GRID ═══════════════════ */
+function initHearts(){
+  S.heartCount=0;
+  document.getElementById('heart-num').textContent=0;
+  document.getElementById('heart-bar').style.width='0%';
+  document.getElementById('btn-to-thread').style.display='none';
+  buildHeartGrid();
+}
+function buildHeartGrid(){
+  const g=document.getElementById('heart-grid');g.innerHTML='';g.style.pointerEvents='auto';g.style.opacity='1';
+  const total=16,positions=new Set();
+  while(positions.size<2) positions.add(Math.floor(Math.random()*total));
+  for(let i=0;i<total;i++){
+    const c=document.createElement('div');c.className='heart-cell';
+    c.textContent=positions.has(i)?'💖':'🤍';
+    c.addEventListener('click',()=>onHeartClick(c,positions.has(i)));
+    g.appendChild(c);
+  }
+}
+function onHeartClick(c,isH){
+  if(isH){
+    c.classList.add('glow');S.heartCount++;
+    document.getElementById('heart-num').textContent=S.heartCount;
+    document.getElementById('heart-bar').style.width=(S.heartCount/12*100)+'%';
+    if(S.heartCount>=12){
+      document.getElementById('btn-to-thread').style.display='block';
+      document.getElementById('heart-grid').style.pointerEvents='none';
+      document.getElementById('heart-grid').style.opacity='.35';
+    } else {setTimeout(buildHeartGrid,380);}
+  } else {
+    c.textContent='💔';c.style.background='#fff0f0';
+    flashScreen('#ff88aa',80);setTimeout(()=>{c.textContent='🤍';c.style.background='';},400);
+  }
+}
+document.getElementById('btn-to-thread').addEventListener('click',()=>{initThread();goStage('s6');});
+
+/* ═══════════════════ S6: RED THREAD ═══════════════════ */
+const DECOYS=['🧶','🪡','🪢','〰️','🎀','🎗️','🔴','💜','🩷','🔮'];
+function initThread(){
+  S.threadTries=5;S.threadFound=false;S.threadLocked=false;
+  document.getElementById('thread-tries').textContent=5;
+  document.getElementById('thread-hint').textContent='\u00a0';
+  document.getElementById('btn-thread-retry').style.display='none';
+  document.getElementById('btn-thread-next').style.display='none';
+  buildThreadArena();
+}
+function buildThreadArena(){
+  const arena=document.getElementById('thread-arena');arena.innerHTML='';
+  const total=11,realIdx=Math.floor(Math.random()*total);
+  for(let i=0;i<total;i++){
+    const el=document.createElement('div');el.className='thread-item';
+    const isReal=(i===realIdx);
+    el.textContent=isReal?'🧵':DECOYS[Math.floor(Math.random()*DECOYS.length)];
+    if(isReal) el.classList.add('thread-real');
+    el.style.left=Math.floor(4+Math.random()*82)+'%';
+    el.style.top=Math.floor(5+Math.random()*78)+'%';
+    el.style.animationDuration=(1.8+Math.random()*2.5)+'s';
+    el.style.animationDelay=(Math.random()*2)+'s';
+    el.dataset.real=isReal?'1':'0';
+    el.addEventListener('click',()=>onThreadClick(el,arena));
+    arena.appendChild(el);
+  }
+}
+function onThreadClick(el,arena){
+  if(S.threadLocked||S.threadFound)return;
+  if(el.dataset.real==='1'){
+    S.threadFound=true;
+    el.style.animation='none';el.style.fontSize='3rem';
+    el.style.filter='drop-shadow(0 0 24px rgba(255,0,200,1))';
+    const dirs=[[-30,-40],[30,-40],[-40,0],[40,0],[-30,40],[30,40]];
+    dirs.forEach((d,k)=>{
+      const sp=document.createElement('div');sp.className='thread-spark';
+      sp.textContent=['✨','💫','🌟','💖'][k%4];
+      sp.style.cssText=`left:${el.style.left};top:${el.style.top};--dx:${d[0]}px;--dy:${d[1]}px;animation-delay:${k*0.07}s`;
+      arena.appendChild(sp);
+    });
+    document.getElementById('thread-hint').textContent='🌟 찾았다!! 이 실이 우리를 이어줘!';
+    setTimeout(()=>document.getElementById('btn-thread-next').style.display='block',900);
+  } else {
+    S.threadLocked=true;
+    flashScreen('#220033',160);
+    el.style.opacity='0.15';el.style.pointerEvents='none';
+    S.threadTries--;document.getElementById('thread-tries').textContent=S.threadTries;
+    arena.style.animation='shake .3s ease';
+    setTimeout(()=>{arena.style.animation='';},350);
+    document.getElementById('thread-hint').textContent='❌ 아니야... 계속 찾아봐';
+    if(S.threadTries<=0){
+      document.getElementById('thread-hint').textContent='💀 실이 끊어졌어...';
+      document.getElementById('btn-thread-retry').style.display='block';
+    } else {
+      setTimeout(()=>{
+        S.threadLocked=false;
+        document.querySelectorAll('#thread-arena .thread-item').forEach(t=>{
+          if(t.style.opacity!=='0.15'){
+            t.style.left=Math.floor(4+Math.random()*82)+'%';
+            t.style.top=Math.floor(5+Math.random()*78)+'%';
+          }
+        });
+        if(S.threadTries<=2) document.getElementById('thread-hint').textContent='⚠️ 기회가 얼마 안 남았어!';
+      },500);
+    }
+  }
+}
+document.getElementById('btn-thread-retry').addEventListener('click',initThread);
+document.getElementById('btn-thread-next').addEventListener('click',()=>{initProposal();goStage('s7');});
+
+/* ═══════════════════ S7: PROPOSAL ═══════════════════ */
+function initProposal(){
+  S.noEscapes=0;
+  const nb=document.getElementById('no-btn');
+  nb.style.top='50%';nb.style.left='55%';
+  document.getElementById('no-escape-msg').textContent='\u00a0';
+}
+const NO_MSGS=['잠깐, 도망가지마 ㅋㅋ','이리와~','잡힐 것 같은데?','포기해~','NO는 없어!','ㅋㅋ 잡힌다!'];
+function runAwayNo(){
+  const arena=document.getElementById('proposal-arena');
+  const aw=arena.offsetWidth,ah=arena.offsetHeight;
+  const nb=document.getElementById('no-btn');
+  const bw=nb.offsetWidth||120,bh=nb.offsetHeight||48;
+  const x=Math.floor(Math.random()*(aw-bw));
+  const y=Math.floor(Math.random()*(ah-bh));
+  nb.style.left=x+'px';nb.style.top=y+'px';
+  S.noEscapes++;
+  document.getElementById('no-escape-msg').textContent=NO_MSGS[Math.min(S.noEscapes-1,NO_MSGS.length-1)];
+}
+document.getElementById('no-btn').addEventListener('mouseenter',runAwayNo);
+document.getElementById('no-btn').addEventListener('touchstart',runAwayNo,{passive:true});
+document.getElementById('yes-btn').addEventListener('click',()=>{launchBalloons();tryLoadImg('img-final','final.jpg');goStage('s8');});
+
+/* ═══════════════════ S8: RESTART ═══════════════════ */
+document.getElementById('btn-restart').addEventListener('click',()=>{
+  loadDone=false;
+  const sb=document.getElementById('btn-s0-start');sb.disabled=false;sb.style.opacity='1';
+  document.getElementById('btn-s0-enter').style.display='none';
+  document.getElementById('load-wrap').style.display='none';
+  document.getElementById('load-bar').style.width='0%';
+  audL.pause();audL.currentTime=0;audS.pause();audS.currentTime=0;
+  document.body.classList.remove('love-mode');
+  goStage('s0');
+});
+
+/* INIT */
+drawWheel(0);
 </script>
-
 </body>
 </html>
