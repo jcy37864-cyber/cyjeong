@@ -94,7 +94,7 @@ elif st.session_state.stage == 3:
     st.markdown('<div class="center">당신은 "정충용" 나를 믿고있어?</div>', unsafe_allow_html=True)
     ans = st.radio("", ["믿는다", "못 믿는다"])
 
-    if st.button("우하하하하하하하하 후회할걸...."):
+    if st.button("선택"):
         st.session_state.stage = 4
 
 # ================= 4단계 (반전 연출) =================
