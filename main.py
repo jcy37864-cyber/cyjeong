@@ -73,7 +73,7 @@ def show_img(file_name):
 # --- [0] 시작화면 ---
 if st.session_state.stage == 0:
     st.markdown('<div class="center big-text">👁️ WARNING</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center info-text">허락 없이 들어온 대가는 가혹할 거야.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center info-text">게임을 좋아하는 이소연... 허락 없이 들어온 대가는 가혹할 거야..(1부터 20까지 시간을 카운트후 입장.) </div>', unsafe_allow_html=True)
     if st.button("운명을 확인하기"):
         st.session_state.stage = 1
         st.rerun()
@@ -81,7 +81,7 @@ if st.session_state.stage == 0:
 # --- [1] 공포의 서막 ---
 elif st.session_state.stage == 1:
     play_audio("bgm_scary.mp3")
-    st.markdown('<div class="center big-text">누군가 널 지켜보고 있어...</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big-text">누군가 널 지켜보고 있어......으악...</div>', unsafe_allow_html=True)
     show_img("scary.jpg")
     if st.button("도망치기 위해 계속 가기"):
         st.session_state.stage = 2
@@ -90,7 +90,7 @@ elif st.session_state.stage == 1:
 # --- [2] 생존 선택 게임 (문 고르기) ---
 elif st.session_state.stage == 2:
     play_audio("bgm_scary.mp3")
-    st.markdown(f'<div class="center big-text">죽음의 선택 ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="center big-text">죽음의 선택.... ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
     st.markdown('<div class="center info-text">단 하나의 문만 살아서 나갈 수 있다.</div>', unsafe_allow_html=True)
     
     # 깜짝 이미지 확률적 등장
@@ -103,31 +103,31 @@ elif st.session_state.stage == 2:
             if st.button(f"문 {i+1}", key=f"door_{i}"):
                 if i == st.session_state.safe_choice:
                     st.session_state.survive += 1
-                    st.toast("...살았군.")
+                    st.toast("...희망이보여...")
                 else:
                     st.session_state.fail += 1
-                    st.toast("크큭... 틀렸어.")
+                    st.toast("크크큭... 틀렸어.....")
                 st.session_state.safe_choice = random.randint(0, 2)
                 st.rerun()
 
     # 결과 체크
     if st.session_state.fail >= 3:
-        st.error("영원히 이곳에 갇혔습니다.")
+        st.error("영원히 이곳에 갇혔습니다....")
         if st.button("다시 처음부터 도전"):
             st.session_state.clear()
             st.rerun()
     
     if st.session_state.survive >= 3:
-        if st.button("빛이 보이는 곳으로 탈출"):
+        if st.button("희미한 빛이 보이는 곳으로 탈출"):
             st.session_state.stage = 3
             st.rerun()
 
 # --- [3] 마지막 심리전 ---
 elif st.session_state.stage == 3:
     play_audio("bgm_scary.mp3")
-    st.markdown('<div class="center big-text">마지막 질문이다...</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big-text">자 이제 마지막 질문이다...</div>', unsafe_allow_html=True)
     show_img("scary2.jpg")
-    st.markdown('<div class="center info-text" style="color:red;">너, 나를 믿어?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center info-text" style="color:red;">너는, 나를 믿어?</div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -136,7 +136,7 @@ elif st.session_state.stage == 3:
             st.rerun()
     with col2:
         if st.button("절대 못 믿어"):
-            st.markdown('<h1 class="center">💥 폭발했습니다 💥</h1>', unsafe_allow_html=True)
+            st.markdown('<h1 class="center">💥 공격 당했습니다 💥</h1>', unsafe_allow_html=True)
             if st.button("부활하기"):
                 st.session_state.clear()
                 st.rerun()
@@ -146,7 +146,7 @@ elif st.session_state.stage == 4:
     st.balloons()
     st.markdown('<div class="center big-text" style="color:#FF4B4B;">🎉 Surprise! 🎉</div>', unsafe_allow_html=True)
     show_img("cute.jpg")
-    st.markdown('<div class="center info-text">무서웠지? 사실 널 위해 준비한 이벤트야!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center info-text">무서웠지? 사실 널 위해 준비한 작은 이벤트야!</div>', unsafe_allow_html=True)
     if st.button("진심을 확인해볼래?"):
         st.session_state.stage = 5
         st.rerun()
@@ -184,7 +184,7 @@ elif st.session_state.stage == 5:
 elif st.session_state.stage == 6:
     play_audio("bgm_love.mp3")
     st.markdown('<div class="center big-text">사실은 말이야...</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center info-text" style="font-size:30px;">나랑 계속 함께해주지 않을래? 🌹</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center info-text" style="font-size:30px;"> 소연씨 나와 축복 받고, 영원히 함께 해주지 않을래? 🌹</div>', unsafe_allow_html=True)
     if st.button("YES! 나도 좋아 💖"):
         st.session_state.stage = 7
         st.rerun()
@@ -193,7 +193,7 @@ elif st.session_state.stage == 6:
 elif st.session_state.stage == 7:
     play_audio("bgm_love.mp3")
     st.balloons()
-    st.markdown('<div class="center big-text" style="color:#FF4B4B;">우리 오늘부터 1일? 💖</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big-text" style="color:#FF4B4B;">우리 사랑 영원히 💖</div>', unsafe_allow_html=True)
     show_img("final.jpg")
     st.markdown('<div class="center info-text">위의 사진(QR)을 확인해봐!</div>', unsafe_allow_html=True)
     
