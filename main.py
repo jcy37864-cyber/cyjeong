@@ -113,7 +113,7 @@ elif st.session_state.stage == 4:
 
 # ================= 5단계 (하트 게임) =================
 elif st.session_state.stage == 5:
-    st.markdown('<div class="center cute">자 하트를 잡아줘 💖</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center cute">자 하트를 많이 많이 잡아줘 💖</div>', unsafe_allow_html=True)
 
     cols = st.columns(3)
     heart_pos = random.randint(0, 2)
@@ -135,8 +135,8 @@ elif st.session_state.stage == 5:
 
 # ================= 6단계 (웃김) =================
 elif st.session_state.stage == 6:
-    st.markdown('<div class="center">중요한 질문 😏</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center big">나는 어떤 사람?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">중요한 질문 이야 😏😏</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big">"정충용"을 어떤 사람이 라고 생각해??</div>', unsafe_allow_html=True)
 
     ans = st.radio("", ["잘생김 😎", "귀여움 🐶", "섹시보이 💯", "다 맞음"])
 
