@@ -72,4 +72,4 @@ def typewriter(text, speed=0.06):
 # ================= 4. 메인 게임 로직 =================
 
 # --- [Stage 0] 입장 및 20초 카운트다운 ---
-if st.session_state.stage
+if st.session_state.stage == 0:
