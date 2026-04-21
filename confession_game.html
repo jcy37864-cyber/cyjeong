@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💀 SCARE — 소연에게</title>
+<title>💀 SCARE — 게임을 좋아하는 소연에게....</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -216,7 +216,7 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 <div class="stage" id="s2">
   <div class="title-horror" style="font-size:1.45rem">🚪 그림자 뒤의 진실</div>
   <div class="shadow-creature" id="shadow-creature">👾</div>
-  <div id="door-streak-box">연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">4</span>연속</div>
+  <div id="door-streak-box">연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">2</span>연속</div>
   <div id="door-hp-wrap">
     <span class="hp-heart" id="hp0">❤️</span>
     <span class="hp-heart" id="hp1">❤️</span>
@@ -475,7 +475,7 @@ function onDoorClick(d){
     d.classList.add('correct');S.doorStreak++;
     document.getElementById('streak-num').textContent=S.doorStreak;
     rotateShadow();
-    if(S.doorStreak>=4){setTimeout(()=>{document.getElementById('door-grid').style.display='none';document.getElementById('btn-door-next').style.display='block';},500);}
+    if(S.doorStreak>=2){setTimeout(()=>{document.getElementById('door-grid').style.display='none';document.getElementById('btn-door-next').style.display='block';},500);}
     else{setTimeout(buildDoors,600);}
   } else {
     d.classList.add('wrong');flashScreen('#ff0000',160);S.doorStreak=0;
@@ -554,7 +554,7 @@ document.getElementById('roulette-spin-btn').addEventListener('click',function()
         S.rCombo++;document.getElementById('combo-num').textContent=S.rCombo;
         ring.textContent='✅';ring.style.borderColor='#22dd22';ring.style.background='#002200';
         st.className='sbox ok';st.textContent='🎉 '+S.rCombo+'회 통과! 한 번 더!';
-        if(S.rCombo>=2){
+        if(S.rCombo>=3){
           st.textContent='🔓 탈출 성공!! 빛이 보여!!';
           self.style.display='none';document.getElementById('btn-to-trust').style.display='block';
           S.rSpinning=false;return;
