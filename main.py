@@ -123,9 +123,9 @@ elif st.session_state.stage == 5:
             if i == heart_pos:
                 if st.button("💖", key=f"heart_{i}"):
                     st.session_state.heart += 1
-         else:
-            if st.button("🖤", key=f"fake_{i}"):
-                st.warning("이건 아니야 😆")
+            else:
+                if st.button("🖤", key=f"fake_{i}"):
+                    st.warning("이건 아니야 😆")
 
     st.write(f"하트: {st.session_state.heart}/5")
 
