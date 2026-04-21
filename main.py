@@ -70,7 +70,7 @@ def typewriter(text, speed=0.06):
 # --- [Stage 0] 입장 및 20초 카운트다운 ---
 if st.session_state.stage == 0:
     st.markdown('<div class="center big-text">👁️ ACCESS DENIED</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center">이소연님... 허락 없이 들어온 대가는 가혹할 거야.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">게임 좋아하는 이소연... 허락 없이 들어온 대가는 가혹할 거야.</div>', unsafe_allow_html=True)
     
     if not st.session_state.loading_done:
         if st.button("권한 요청 (ID: 이소연)"):
