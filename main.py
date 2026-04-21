@@ -7,6 +7,7 @@ import time
 # ================= 1. 페이지 설정 및 세션 초기화 =================
 st.set_page_config(page_title="scare", page_icon="🎨", layout="centered")
 
+# 세션 변수 초기화
 if "stage" not in st.session_state:
     st.session_state.update({
         "stage": 0,
@@ -19,7 +20,8 @@ if "stage" not in st.session_state:
         "trust_count": 0,
         "roulette_score": 0,
         "roulette_done": False,
-        "dist": 100
+        "dist": 100,
+        "current_track": None  # 현재 재생 중인 노래 추적
     })
 
 # ================= 2. 🎨 디자인 및 애니메이션 테마 =================
@@ -52,16 +54,19 @@ def apply_theme():
 
 apply_theme()
 
-# ================= 3. 🎵 오디오 제어 (중복 방지) =================
-audio_placeholder = st.empty()
-
+# ================= 3. 🎵 오디오 제어 (중복 및 끊김 방지) =================
 def play_audio(file_name):
+    # 이미 해당 곡이 재생 중이라면 다시 실행하지 않음 (끊김 방지 핵심)
+    if st.session_state.current_track == file_name:
+        return 
+    
     if os.path.exists(file_name):
         with open(file_name, "rb") as f:
             b64 = base64.b64encode(f.read()).decode()
-        # 이전 오디오 태그를 교체하여 겹침 방지
-        audio_placeholder.markdown(
-            f'<audio id="bgm" src="data:audio/mp3;base64,{b64}" autoplay loop></audio>', 
+        st.session_state.current_track = file_name
+        # 오디오 태그를 화면에 출력 (고정된 위치 없이 호출 시점에 생성)
+        st.markdown(
+            f'<audio src="data:audio/mp3;base64,{b64}" autoplay loop></audio>', 
             unsafe_allow_html=True
         )
 
@@ -79,48 +84,46 @@ def typewriter(text, speed=0.06):
 
 # ================= 4. 메인 게임 로직 =================
 
-# [Stage 0] 로딩 (IndexError 수정됨)
+# [Stage 0] 로딩
 if st.session_state.stage == 0:
     st.markdown('<div class="center" style="font-size:35px; font-weight:bold;">👁️ ACCESS DENIED</div>', unsafe_allow_html=True)
     if not st.session_state.loading_done:
         if st.button("권한 요청 (ID: 이소연)"):
             bar = st.progress(0)
             status_text = st.empty()
-            # 메시지 개수를 늘려 인덱스 에러 방지
-            msgs = ["접속 우회...", "ID 추적 중...", "보안 뚫는 중...", "최종 승인 중...", "준비 완료."]
+            msgs = ["보안 우회 중...", "ID 추적 중...", "DB 침투 중...", "최종 승인 중...", "완료."]
             for i in range(101):
                 time.sleep(0.06)
                 bar.progress(i)
-                # i//25가 4를 넘지 않도록 처리
                 idx = min(i // 25, len(msgs) - 1)
                 status_text.markdown(f'<div class="center" style="color:gray;">{msgs[idx]}</div>', unsafe_allow_html=True)
             st.session_state.loading_done = True
             st.rerun()
     else:
         st.warning("⚠️ 이소연의 접속이 승인되었습니다.")
-        if st.button("깊은 곳으로 들어가기"):
+        if st.button("어둠 속으로 입장"):
             st.session_state.stage = 1
             st.rerun()
 
-# [Stage 1] 도망쳐! (강화된 연출)
+# [Stage 1] 도망쳐!
 elif st.session_state.stage == 1:
     play_audio("bgm_scary.mp3")
     st.markdown('<div class="center shake-text">소연아 도망쳐!!!</div>', unsafe_allow_html=True)
     show_img("scary.jpg")
-    st.markdown(f'<div class="center" style="font-size:20px;">뒤에 있는 그것과의 거리: <b style="color:red;">{st.session_state.dist}m</b></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="center" style="font-size:20px;">거리: <b style="color:red;">{st.session_state.dist}m</b></div>', unsafe_allow_html=True)
     
     if st.session_state.dist > 0:
-        if st.button("미친 듯이 뛰기 (Click!)"):
+        if st.button("미친 듯이 뛰기 (클릭!)"):
             st.session_state.dist -= 20
-            st.toast("조금만 더!!")
+            st.toast("더 빨리!!")
             st.rerun()
     else:
-        st.success("겨우 따돌린 것 같다...")
+        st.success("따돌린 것 같다...")
         if st.button("다음 통로로 이동하기"):
             st.session_state.stage = 2
             st.rerun()
 
-# [Stage 2] 죽음의 선택 (3회)
+# [Stage 2] 문 선택 (3회)
 elif st.session_state.stage == 2:
     play_audio("bgm_scary.mp3")
     st.markdown(f'<div class="center" style="font-size:30px;">문 선택 ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
@@ -138,7 +141,7 @@ elif st.session_state.stage == 2:
                 st.rerun()
     if st.session_state.fail >= 3:
         show_img("jumpscare.jpg")
-        if st.button("영혼을 다잡고 다시 도전"):
+        if st.button("다시 도전"):
             st.session_state.survive = 0; st.session_state.fail = 0; st.rerun()
     if st.session_state.survive >= 3:
         if st.button("탈출구 발견!"):
@@ -152,13 +155,13 @@ elif st.session_state.stage == 2.5:
     
     if not st.session_state.roulette_done:
         if st.button("룰렛 돌리기"):
-            with st.spinner("운명을 결정하는 중..."):
+            with st.spinner("운명 결정 중..."):
                 time.sleep(1)
                 if random.choice(["꽝", "통과", "꽝"]) == "통과":
                     st.session_state.roulette_score += 1
                     if st.session_state.roulette_score >= 2: st.session_state.roulette_done = True
                 else:
-                    st.error("꽝! 처음부터 다시!")
+                    st.error("꽝! 다시 시작해!")
                     show_img("jumpscare.jpg")
                     st.session_state.roulette_score = 0
             st.rerun()
@@ -170,7 +173,7 @@ elif st.session_state.stage == 2.5:
 elif st.session_state.stage == 3:
     play_audio("bgm_scary.mp3")
     show_img("scary.jpg")
-    msgs = ["소연아, 나 믿어?", "진짜 믿어?", "내 손 잡아줄 거지?"]
+    msgs = ["소연아, 나 믿어?", "진짜 믿어?", "내 손 잡을 거지?"]
     btns = ["믿는다", "진짜!", "당연하지!"]
     typewriter(msgs[min(st.session_state.trust_count, 2)])
     
@@ -187,18 +190,18 @@ elif st.session_state.stage == 3:
 
 # [Stage 4] 반전 고백
 elif st.session_state.stage == 4:
-    play_audio("bgm_love.mp3")
+    play_audio("bgm_love.mp3") # 노래 교체 (끊김 없이 바뀜)
     st.balloons()
-    st.markdown('<div class="center" style="font-size:35px; color:#FF4B4B; font-weight:bold;">🎉 놀랐지? 소연아! 🎉</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center" style="font-size:35px; color:#FF4B4B; font-weight:bold;">🎉 소연아! 놀랐지? 🎉</div>', unsafe_allow_html=True)
     show_img("cute.jpg")
-    typewriter("무서운 건 전부 가짜야! 널 위해 준비한 이벤트지.")
-    if st.button("내 진심을 확인해줘"):
+    typewriter("전부 가짜야! 널 위해 준비한 이벤트지.")
+    if st.button("내 진심 확인하기"):
         st.session_state.stage = 5; st.rerun()
 
 # [Stage 5] 하트 잡기 (10개)
 elif st.session_state.stage == 5:
     play_audio("bgm_love.mp3")
-    st.markdown(f'<div class="center" style="font-size:30px; color:#FF4B4B;">내 마음을 잡아줘 💖 ({st.session_state.heart}/10)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="center" style="font-size:30px; color:#FF4B4B;">마음을 잡아줘 💖 ({st.session_state.heart}/10)</div>', unsafe_allow_html=True)
     st.progress(st.session_state.heart / 10)
     cols = st.columns(3)
     for i in range(3):
@@ -212,8 +215,8 @@ elif st.session_state.stage == 5:
                 if st.button("🤍", key=f"e_{i}"): 
                     st.session_state.heart_choice = random.randint(0, 2); st.rerun()
     if st.session_state.heart >= 10:
-        if st.button("진심 확인하러 가기 ✨"):
-            with st.spinner("두근거리는 중..."): time.sleep(2)
+        if st.button("진심 확인 ✨"):
+            with st.spinner("준비 중..."): time.sleep(2)
             st.session_state.stage = 6; st.rerun()
 
 # [Stage 6~7] 최종 고백 및 엔딩
