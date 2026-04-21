@@ -4,7 +4,7 @@ import os
 import base64
 
 # ================= 1. 페이지 설정 및 세션 상태 초기화 =================
-st.set_page_config(page_title="고백 프로젝트 V2", page_icon="💖", layout="centered")
+st.set_page_config(page_title="scare", page_icon="🎨", layout="centered")
 
 # 게임 데이터를 저장하는 '기억 저장소'
 if "stage" not in st.session_state:
