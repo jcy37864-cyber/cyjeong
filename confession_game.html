@@ -6,72 +6,30 @@
 <title>💀 SCARE — 소연에게 (HARD MODE)</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* 원본 디자인 스타일 시트 그대로 복구 */
+/* 원본 디자인 유지 */
 :root {
   --h-bg:#080808;--h-text:#ff2222;--h-dim:#991111;
   --l-bg:#fff5f7;--l-text:#c0194a;--l-accent:#ff4b7b;
   --font-main:'Black Han Sans',sans-serif;--font-body:'Noto Sans KR',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{width:100%;min-height:100vh;}
-body{font-family:var(--font-body);background:var(--h-bg);color:var(--h-text);
-  min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
-  transition:background 1s ease,color 1s ease;overflow-x:hidden;}
-body.love-mode{background:var(--l-bg);color:var(--l-text);}
-#game{width:100%;max-width:580px;padding:2rem 1.5rem 4rem;min-height:100vh;
-  display:flex;flex-direction:column;gap:1.4rem;}
+body{font-family:var(--font-body);background:var(--h-bg);color:var(--h-text);transition:background 1s;overflow-x:hidden;display:flex;justify-content:center;}
+#game{width:100%;max-width:580px;padding:2rem 1.5rem;min-height:100vh;display:flex;flex-direction:column;gap:1.4rem;}
 .stage{display:none;flex-direction:column;gap:1.3rem;animation:fadeIn .45s ease;}
 .stage.active{display:flex;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.title-horror{font-family:var(--font-main);font-size:clamp(1.8rem,7vw,2.8rem);
-  color:var(--h-text);text-align:center;letter-spacing:.05em;
-  text-shadow:0 0 30px rgba(255,34,34,.55);animation:flicker 3s infinite;}
-.title-love{font-family:var(--font-main);font-size:clamp(1.6rem,6vw,2.4rem);
-  color:var(--l-accent);text-align:center;letter-spacing:.03em;}
-.subtitle{font-size:1rem;text-align:center;opacity:.82;line-height:1.7;}
-.btn{width:100%;padding:.95rem 1.3rem;font-family:var(--font-main);
-  font-size:1.1rem;letter-spacing:.04em;border-radius:10px;cursor:pointer;
-  transition:all .16s ease;}
+.title-horror{font-family:var(--font-main);font-size:2.1rem;color:var(--h-text);text-align:center;text-shadow:0 0 30px rgba(255,34,34,.55);}
+.btn{width:100%;padding:.95rem;font-family:var(--font-main);font-size:1.1rem;border-radius:10px;cursor:pointer;transition:all .16s;}
 .btn-horror{background:#0f0f0f;color:var(--h-text);border:2px solid var(--h-dim);}
-.btn-horror:hover{background:#1a0000;border-color:var(--h-text);transform:scale(1.02);box-shadow:0 0 18px rgba(255,34,34,.3);}
-.btn-love{background:#fff0f3;color:var(--l-text);border:2px solid var(--l-accent);}
-.btn-love:hover{background:#ffe0e8;transform:scale(1.02);box-shadow:0 4px 18px rgba(255,75,123,.22);}
+.load-bar-outer{background:#111;border-radius:99px;height:18px;border:1px solid #330000;overflow:hidden;}
+.load-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#660000,#ff0000);transition:width 0.1s;}
 .prog-wrap{background:#1a0000;border-radius:99px;height:13px;overflow:hidden;border:1px solid #330000;}
-.prog-bar{height:100%;background:linear-gradient(90deg,#ff0000,#ff6644);border-radius:99px;transition:width .35s ease;}
-.prog-wrap.love{background:#ffe0e8;border-color:#ffc0cc;}
-.prog-wrap.love .prog-bar{background:linear-gradient(90deg,#ff4b7b,#ff90b0);}
-.sbox{border:2px solid var(--h-dim);background:#0a0000;border-radius:10px;
-  padding:1rem 1.2rem;font-size:1rem;font-weight:700;text-align:center;line-height:1.6;}
-.img-box{width:100%;border-radius:12px;overflow:hidden;border:3px solid #220000;background:#111;}
-.img-box img{width:100%;display:block;object-fit:cover;max-height:300px;}
-.img-ph{width:100%;height:180px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.4rem;color:#444;font-size:.82rem;text-align:center;padding:1rem;}
-.load-bar-outer{background:#111;border-radius:99px;height:18px;overflow:hidden;border:1px solid #330000;}
-.load-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#660000,#ff0000);border-radius:99px;transition:width .08s linear;}
-.load-msg{font-size:.88rem;color:#666;text-align:center;min-height:1.2em;}
-.shake{display:inline-block;animation:shake .32s infinite;font-family:var(--font-main);
-  font-size:clamp(1.5rem,5.5vw,2rem);color:var(--h-text);text-shadow:0 0 18px rgba(255,0,0,.6);text-align:center;}
-@keyframes shake{0%{transform:translate(3px,2px)}50%{transform:translate(-4px,-3px)}100%{transform:translate(3px,-2px)}}
-@keyframes flicker{0%,90%,100%{opacity:1}91%{opacity:.5}95%{opacity:.25}}
-.flash-overlay{position:fixed;inset:0;background:#ff0000;opacity:0;pointer-events:none;z-index:9000;transition:opacity .05s;}
-#balloon-wrap{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden;}
-.balloon{position:absolute;bottom:-60px;animation:rise linear forwards;}
-@keyframes rise{to{transform:translateY(-110vh) rotate(20deg);opacity:0;}}
-.dist-big{font-family:var(--font-main);font-size:2.2rem;text-align:center;color:#ff2222;}
-.countdown-ring{font-family:var(--font-main);font-size:3.5rem;color:#ff2222;line-height:1;text-align:center;}
-.door-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-.door-card{aspect-ratio:.55/1;border-radius:10px;border:2px solid #2a0000;background:#0a0000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.8rem;transition:all .18s;}
-.door-card.wrong{animation:dWrong .35s ease;}
-@keyframes dWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-#roulette-canvas-wrap{display:flex;justify-content:center;position:relative;}
-#roulette-canvas{border-radius:50%;filter:drop-shadow(0 0 16px rgba(255,0,0,.4));}
-#roulette-needle{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:30px solid #ffff00;z-index:10;}
-#spin-result-ring{width:110px;height:110px;border-radius:50%;border:4px solid #330000;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:1rem auto;}
-.heart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.heart-cell{aspect-ratio:1;border-radius:10px;border:2px solid #ffc0cc;background:#fff5f7;display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;transition:all .18s;}
+.prog-bar{height:100%;background:linear-gradient(90deg,#ff0000,#ff6644);transition:width .35s;}
+.door-grid, .heart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.door-card, .heart-cell{aspect-ratio:1;border-radius:10px;border:2px solid #2a0000;background:#0a0000;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5rem;}
 #thread-arena{position:relative;width:100%;height:380px;background:#030010;border-radius:14px;border:2px solid #1a0030;overflow:hidden;}
-.thread-item{position:absolute;cursor:pointer;font-size:1.8rem;filter:drop-shadow(0 0 5px rgba(200,0,255,.5));}
-#proposal-arena{position:relative;height:160px;}
-#no-btn{position:absolute;width:38%;transition:all .1s ease;}
+.thread-item{position:absolute;cursor:pointer;font-size:1.8rem;}
+.flash-overlay{position:fixed;inset:0;background:red;opacity:0;pointer-events:none;transition:opacity .1s;}
 </style>
 </head>
 <body>
@@ -79,163 +37,149 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 <div id="game">
   <div class="stage active" id="s0">
     <div class="title-horror">👁️ SYSTEM BREACH</div>
-    <div class="subtitle">소연이의 데이터를 강제 복구 중...</div>
     <div id="load-wrap" style="display:none; flex-direction:column; gap:1rem;">
       <div class="load-bar-outer"><div class="load-bar-inner" id="load-bar"></div></div>
-      <div class="load-msg" id="load-msg">대기 중...</div>
+      <div id="load-msg" style="text-align:center; font-size:0.9rem;">데이터 침투 중...</div>
     </div>
-    <button class="btn btn-horror" id="btn-s0-start">🩸 데이터 복구 시작</button>
-    <button class="btn btn-horror" id="btn-s0-enter" style="display:none">💀 어둠 속으로 입장</button>
+    <button class="btn btn-horror" id="btn-s0-start">🩸 권한 강제 탈취 (시작)</button>
+    <button class="btn btn-horror" id="btn-s0-enter" style="display:none">💀 입장하기</button>
   </div>
 
   <div class="stage" id="s1">
-    <div class="shake">🔪 소연아!! 뒤를 봐!! 🔪</div>
-    <div class="img-box" id="img-scary"><div class="img-ph">👁️ scary.jpg</div></div>
-    <div class="dist-big">🏃 <span id="dist-num">200</span>m</div>
+    <div class="title-horror">🏃 뒤를 돌아보지 마!</div>
+    <div style="text-align:center; font-size:2rem;">거리: <span id="dist-num">200</span>m</div>
     <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
-    <div class="countdown-ring" id="dash-timer">4</div>
-    <div style="text-align:center; font-size:0.8rem; color:#666;">4초마다 귀신이 15m씩 접근합니다!</div>
-    <button class="btn btn-horror" id="btn-run" style="font-size:1.4rem;">🏃 광클해서 도망쳐!!</button>
-    <button class="btn btn-horror" id="btn-escape-room" style="display:none">🚪 탈출구 발견!</button>
-  </div>
-
-  <div class="stage" id="s2">
-    <div class="title-horror">🚪 그림자 문</div>
-    <div style="text-align:center">연속 성공: <span id="streak-num">0</span> / 4</div>
-    <div style="text-align:center; font-size:1.2rem;" id="door-hp-wrap">목숨: ❤️❤️❤️</div>
-    <div class="door-grid" id="door-grid"></div>
-    <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 재도전</button>
-    <button class="btn btn-horror" id="btn-door-next" style="display:none">🔦 다음 단계로</button>
+    <button class="btn btn-horror" id="btn-run">🏃 광클해서 도망쳐!!</button>
+    <button class="btn btn-horror" id="btn-s1-next" style="display:none">🚪 탈출구 발견</button>
   </div>
 
   <div class="stage" id="s25">
-    <div class="shake" style="font-size:1.8rem;">💀 죽음의 룰렛 💀</div>
-    <div class="subtitle">오직 한 칸만이 '통과'입니다.</div>
-    <div id="roulette-canvas-wrap">
-      <canvas id="roulette-canvas" width="260" height="260"></canvas>
-      <div id="roulette-needle"></div>
-    </div>
-    <div id="spin-result-ring">❓</div>
-    <button class="btn btn-horror" id="roulette-spin-btn">🎰 돌려라! (운명에 맡기기)</button>
-    <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 틈으로 탈출</button>
-  </div>
-
-  <div class="stage" id="s3">
-    <div class="title-horror">소연아, 날 믿어?</div>
-    <div id="trust-phrase" style="text-align:center; font-size:1.4rem; color:red; margin-bottom:1rem; font-family:var(--font-main);"></div>
-    <input id="trust-input" type="text" autocomplete="off" style="width:100%; padding:1.2rem; background:#0a0000; color:red; border:2px solid red; text-align:center; font-size:1.3rem; border-radius:10px;" placeholder="똑같이 입력하세요">
-  </div>
-
-  <div class="stage" id="s4">
-    <div class="title-love">🌹 사실 이건... 🌹</div>
-    <div class="img-box love-frame" id="img-cute"><div class="img-ph">🌸 cute.jpg</div></div>
-    <button class="btn btn-love" id="btn-to-heart">💖 내 진심을 확인해줄래?</button>
+    <div class="title-horror">🎰 죽음의 룰렛</div>
+    <div id="spin-result" style="text-align:center; font-size:3rem; margin:1rem;">❓</div>
+    <button class="btn btn-horror" id="btn-spin">룰렛 돌리기</button>
+    <button class="btn btn-horror" id="btn-s25-next" style="display:none">🩸 틈으로 탈출</button>
   </div>
 
   <div class="stage" id="s5">
-    <div class="title-love">내 마음을 모아줘! 💖</div>
-    <div style="text-align:center; font-size:1.5rem; margin-bottom:1rem; color:var(--l-accent);">수집된 하트: <span id="heart-num">0</span> / 18</div>
-    <div style="text-align:center; font-size:0.8rem; color:red; margin-bottom:0.5rem; font-weight:bold;">※ 빈 하트(🤍)를 누르면 -1개 감점됩니다!</div>
+    <div class="title-horror" style="color:pink;">💖 마음 모으기</div>
+    <div style="text-align:center; margin-bottom:10px;">하트: <span id="heart-count">0</span> / 18</div>
     <div class="heart-grid" id="heart-grid"></div>
-    <button class="btn btn-love" id="btn-to-thread" style="display:none">🧵 운명의 실 찾기</button>
+    <button class="btn btn-horror" id="btn-s5-next" style="display:none">🧵 실 찾기</button>
   </div>
 
   <div class="stage" id="s6">
-    <div class="title-horror" style="color:#dd00bb; text-shadow:0 0 15px rgba(220,0,180,0.5);">🧵 운명의 붉은 실</div>
-    <div class="subtitle" style="color:#aaa;">30개의 실 중 우리를 잇는 실은 단 하나.<br>단 2번의 기회뿐이야.</div>
+    <div class="title-horror" style="color:purple;">🧵 운명의 실</div>
+    <div style="text-align:center;">남은 기회: <span id="thread-tries">2</span></div>
     <div id="thread-arena"></div>
-    <div style="text-align:center; font-weight:bold; font-size:1.1rem;">남은 기회: <span id="thread-tries">2</span></div>
-    <button class="btn btn-horror" id="btn-thread-retry" style="display:none">🩸 실이 끊어졌다.. 다시 하기</button>
-    <button class="btn btn-horror" id="btn-thread-next" style="display:none">💌 마지막으로...</button>
-  </div>
-
-  <div class="stage" id="s7">
-    <div class="title-love">소연아, 나랑 만나줄래?</div>
-    <div id="proposal-arena">
-      <button class="btn btn-love" id="yes-btn" style="position:absolute; width:52%; left:5%; top:40%;">YES! 😍</button>
-      <button class="btn btn-horror" id="no-btn">NO</button>
-    </div>
-  </div>
-
-  <div class="stage" id="s8">
-    <div class="title-love">🎉 오늘부터 1일! 🎉</div>
-    <div class="img-box love-frame" id="img-final"><div class="img-ph">💑 final.jpg</div></div>
-    <div class="sbox love" style="margin-top:1rem; background:#fff0f3; color:var(--l-text); border-color:var(--l-accent);">축하해 소연아! 사랑해! 💖</div>
-    <button class="btn btn-love" id="btn-restart">다시 하기</button>
+    <button class="btn btn-horror" id="btn-s6-next" style="display:none">💌 마지막으로</button>
   </div>
 </div>
 
-<audio id="aud-scary" loop><source src="bgm_scary.mp3" type="audio/mpeg"></audio>
-<audio id="aud-love" loop><source src="bgm_love.mp3" type="audio/mpeg"></audio>
-<div id="balloon-wrap"></div>
 <div class="flash-overlay" id="flash"></div>
 
 <script>
-const S = {
-  dist:200, dashTimer:4, doorHP:3, doorStreak:0, heart:0, threadTries:2,
-  audioUnlocked: false
+const S = { dist: 200, hearts: 0, tries: 2 };
+
+function go(id) {
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// S0 로딩 로직 수정
+document.getElementById('btn-s0-start').onclick = function() {
+  this.style.display = 'none';
+  document.getElementById('load-wrap').style.display = 'flex';
+  let p = 0;
+  const bar = document.getElementById('load-bar');
+  const iv = setInterval(() => {
+    p += 2;
+    bar.style.width = p + '%';
+    if (p >= 100) {
+      clearInterval(iv);
+      document.getElementById('btn-s0-enter').style.display = 'block';
+    }
+  }, 50);
 };
 
-function go(id){
-  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-  if(['s4','s5','s6','s7','s8'].includes(id)){
-    document.body.classList.add('love-mode');
-    document.getElementById('aud-scary').pause();
-    if(S.audioUnlocked) document.getElementById('aud-love').play();
-  } else if(id !== 's0') {
-    document.body.classList.remove('love-mode');
-    if(S.audioUnlocked) document.getElementById('aud-scary').play();
+document.getElementById('btn-s0-enter').onclick = () => go('s1');
+
+// S1 달리기 상향 (1회 클릭당 3m 전진)
+document.getElementById('btn-run').onclick = function() {
+  S.dist -= 3;
+  if (S.dist <= 0) {
+    S.dist = 0;
+    this.style.display = 'none';
+    document.getElementById('btn-s1-next').style.display = 'block';
+  }
+  document.getElementById('dist-num').textContent = S.dist;
+  document.getElementById('dist-bar').style.width = (S.dist / 200 * 100) + '%';
+};
+
+document.getElementById('btn-s1-next').onclick = () => go('s25');
+
+// S2.5 룰렛 상향 (1/8 확률)
+document.getElementById('btn-spin').onclick = function() {
+  const res = Math.random() < 0.125 ? '✅ 통과' : '💀 꽝';
+  document.getElementById('spin-result').textContent = res;
+  if (res === '✅ 통과') {
+    this.style.display = 'none';
+    document.getElementById('btn-s25-next').style.display = 'block';
+  } else {
+    flash();
+  }
+};
+
+document.getElementById('btn-s25-next').onclick = () => { buildHearts(); go('s5'); };
+
+// S5 하트 상향 (18개 목표 & 감점)
+function buildHearts() {
+  const g = document.getElementById('heart-grid'); g.innerHTML = '';
+  for (let i = 0; i < 16; i++) {
+    const c = document.createElement('div'); c.className = 'heart-cell';
+    const isH = Math.random() > 0.8;
+    c.textContent = isH ? '💖' : '🤍';
+    c.onclick = () => {
+      if (isH) S.hearts++;
+      else { S.hearts = Math.max(0, S.hearts - 1); flash(); }
+      document.getElementById('heart-count').textContent = S.hearts;
+      if (S.hearts >= 18) {
+        g.style.display = 'none';
+        document.getElementById('btn-s5-next').style.display = 'block';
+      } else buildHearts();
+    };
+    g.appendChild(c);
   }
 }
 
-// 이미지 로드 함수 복구
-function tryLoadImg(id,src){
-  const w=document.getElementById(id); if(!w)return;
-  const i=new Image(); i.onload=()=>{w.innerHTML=`<img src="${src}" alt="">`;}; i.src=src;
+document.getElementById('btn-s5-next').onclick = () => { buildThreads(); go('s6'); };
+
+// S6 운명의 실 상향 (30개 중 1개 & 기회 2번)
+function buildThreads() {
+  const a = document.getElementById('thread-arena'); a.innerHTML = '';
+  const win = Math.floor(Math.random() * 30);
+  for (let i = 0; i < 30; i++) {
+    const t = document.createElement('div'); t.className = 'thread-item';
+    t.textContent = '🧵';
+    t.style.left = Math.random() * 90 + '%'; t.style.top = Math.random() * 90 + '%';
+    t.onclick = () => {
+      if (i === win) {
+        t.style.fontSize = '4rem';
+        document.getElementById('btn-s6-next').style.display = 'block';
+      } else {
+        S.tries--; flash();
+        document.getElementById('thread-tries').textContent = S.tries;
+        if (S.tries <= 0) { alert('실이 끊어졌습니다!'); location.reload(); }
+      }
+    };
+    a.appendChild(t);
+  }
 }
 
-// 로딩 연출 복구
-document.getElementById('btn-s0-start').onclick = function(){
-  this.style.display = 'none';
-  document.getElementById('load-wrap').style.display='flex';
-  const bar=document.getElementById('load-bar'), msg=document.getElementById('load-msg');
-  let p = 0;
-  const iv = setInterval(()=>{
-    p += 1.5;
-    bar.style.width = p+'%';
-    msg.textContent = p<40?'영혼의 주파수 맞추는 중...':p<80?'어둠의 경로 탐색 중...':'성공.';
-    if(p>=100){
-      clearInterval(iv);
-      document.getElementById('btn-s0-enter').style.display='block';
-    }
-  }, 40);
-};
-
-document.getElementById('btn-s0-enter').onclick = ()=>{ 
-  S.audioUnlocked = true;
-  tryLoadImg('img-scary','scary.jpg');
-  go('s1'); startDash(); 
-};
-
-// S1: 달리기 (5배 어려움)
-let dashIv;
-function startDash(){
-  dashIv = setInterval(()=>{
-    S.dashTimer--;
-    document.getElementById('dash-timer').textContent = S.dashTimer;
-    if(S.dashTimer <= 0){
-      S.dist = Math.min(200, S.dist + 15);
-      S.dashTimer = 4;
-      updateDash();
-    }
-  }, 1000);
+function flash() {
+  const f = document.getElementById('flash');
+  f.style.opacity = '0.5';
+  setTimeout(() => f.style.opacity = '0', 100);
 }
-document.getElementById('btn-run').onclick = ()=>{
-  S.dist -= 3; // 클릭당 전진 대폭 하향 (원본 15 -> 3)
-  updateDash();
-};
-function updateDash(){
-  document.getElementById('dist-num').textContent = S.dist;
-  document.getElementById('dist-bar').style
+</script>
+</body>
+</html>
