@@ -68,7 +68,7 @@ elif st.session_state.stage == 1:
 # ================= 2단계 (생존 게임) =================
 elif st.session_state.stage == 2:
     st.markdown('<div class="center big">자 생존 게임을 시작하겠다.</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center">3개의 쥐덧 중 하나만이 안전하다. 눌러!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">3개의 쥐덧 중 하나만이 안전하다. 눌러! (3번 모두 성공시 탈출.)</div>', unsafe_allow_html=True)
 
     cols = st.columns(3)
     safe = random.randint(0, 2)
