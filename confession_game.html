@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💀 SCARE — 게임을 좋아하는 소연에게....</title>
+<title>💀 SCARE — 소연에게</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -200,7 +200,7 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 <div class="stage" id="s1">
   <div class="shake" id="shake-text">🔪 소연아!! 뒤를 봐!! 🔪</div>
   <div class="img-box" id="img-scary"><div class="img-ph"><div class="ic">👁️</div><div>scary.jpg</div></div></div>
-  <div class="dist-big">🏃 <span id="dist-num">200</span>m</div>
+  <div class="dist-big">🏃 <span id="dist-num">300</span>m</div>
   <div id="dist-delta">&nbsp;</div>
   <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
   <div id="dash-timer-wrap" style="display:none">
@@ -389,9 +389,9 @@ document.getElementById('btn-s0-enter').addEventListener('click',()=>{tryLoadImg
 
 /* ═══════════════════ S1: DASH ═══════════════════ */
 function initDash(){
-  S.dist=200;S.maxDist=200;S.stamina=5;
+  S.dist=300;S.maxDist=300;S.stamina=5;
   clearInterval(S.dashTI);
-  document.getElementById('dist-num').textContent=200;
+  document.getElementById('dist-num').textContent=300;
   document.getElementById('dist-bar').style.width='100%';
   document.getElementById('dist-delta').textContent='\u00a0';
   document.getElementById('btn-run').style.display='block';
@@ -429,7 +429,7 @@ function startDashTimer(){
 }
 document.getElementById('btn-run').addEventListener('click',function(){
   clearInterval(S.dashTI);
-  const r=15+Math.floor(Math.random()*12);
+  const r=10+Math.floor(Math.random()*9);
   S.dist=Math.max(0,S.dist-r);
   document.getElementById('dist-num').textContent=S.dist;
   document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
@@ -481,7 +481,8 @@ function onDoorClick(d){
     d.classList.add('wrong');flashScreen('#ff0000',160);S.doorStreak=0;
     document.getElementById('streak-num').textContent=0;
     S.doorHP--;
-    if(S.doorHP>=0){const h=document.getElementById('hp'+S.doorHP);if(h){h.classList.add('lost');h.textContent='🖤';}}
+    const hEl = document.getElementById('hp'+(S.doorHP));
+    if(hEl){ hEl.classList.add('lost'); hEl.textContent='🖤'; }
     if(S.doorHP<=0){
       document.getElementById('door-grid').style.display='none';
       document.getElementById('door-dead-box').style.display='block';
@@ -516,11 +517,11 @@ function drawWheel(a){
 }
 
 function initRoulette(){
-  S.rCombo=0;S.rSpinning=false;
+  S.rCombo=0; S.rSpinning=false; rAngle=0;
   document.getElementById('combo-num').textContent=0;
   document.getElementById('roulette-status').style.display='none';
   const btn=document.getElementById('roulette-spin-btn');
-  btn.style.display='block';btn.disabled=false;btn.textContent='🎰 룰렛을 돌려라!';
+  btn.style.display='block'; btn.disabled=false; btn.textContent='🎰 룰렛을 돌려라!';
   document.getElementById('btn-to-trust').style.display='none';
   document.getElementById('spin-result-ring').textContent='❓';
   document.getElementById('spin-result-ring').style.borderColor='#330000';
@@ -528,45 +529,59 @@ function initRoulette(){
   drawWheel(0);
 }
 
-document.getElementById('roulette-spin-btn').addEventListener('click',function(){
-  if(S.rSpinning)return;
-  S.rSpinning=true;this.disabled=true;this.textContent='⏳ 돌아간다...';
-  const extra=(5+Math.floor(Math.random()*5))*360;
-  const stop=Math.floor(Math.random()*360);
-  const total=extra+stop;
-  const dur=3200;const t0=performance.now();const a0=rAngle;
-  const ease=t=>1-Math.pow(1-t,3);
-  const self=this;
-  (function anim(now){
-    const t=Math.min((now-t0)/dur,1);
-    rAngle=(a0+total*ease(t))%360;
+document.getElementById('roulette-spin-btn').addEventListener('click', function(){
+  if(S.rSpinning) return;
+  S.rSpinning = true;
+  const spinBtn = document.getElementById('roulette-spin-btn');
+  spinBtn.disabled = true;
+  spinBtn.textContent = '⏳ 돌아간다...';
+  const extra = (5+Math.floor(Math.random()*5))*360;
+  const stop  = Math.floor(Math.random()*360);
+  const total = extra+stop;
+  const dur   = 3200;
+  const t0    = performance.now();
+  const a0    = rAngle;
+  const ease  = t => 1-Math.pow(1-t,3);
+  function anim(now){
+    const t = Math.min((now-t0)/dur, 1);
+    rAngle = (a0+total*ease(t))%360;
     drawWheel(rAngle);
-    if(t<1){requestAnimationFrame(anim);}
-    else{
-      const n=RSEGS.length,sl=360/n;
-      const needleAngle=(360-rAngle%360+270)%360;
-      const idx=Math.floor(needleAngle/sl)%n;
-      const pass=RSEGS[idx]==='통과';
-      const ring=document.getElementById('spin-result-ring');
-      const st=document.getElementById('roulette-status');
-      st.style.display='block';
-      if(pass){
-        S.rCombo++;document.getElementById('combo-num').textContent=S.rCombo;
-        ring.textContent='✅';ring.style.borderColor='#22dd22';ring.style.background='#002200';
-        st.className='sbox ok';st.textContent='🎉 '+S.rCombo+'회 통과! 한 번 더!';
-        if(S.rCombo>=3){
-          st.textContent='🔓 탈출 성공!! 빛이 보여!!';
-          self.style.display='none';document.getElementById('btn-to-trust').style.display='block';
-          S.rSpinning=false;return;
-        }
-      } else {
-        S.rCombo=0;document.getElementById('combo-num').textContent=0;
-        ring.textContent='💀';ring.style.borderColor='#ff4444';ring.style.background='#220000';
-        st.className='sbox bad';st.textContent='💀 [꽝] 처음부터 다시!';flashScreen('#ff0000',200);
+    if(t < 1){ requestAnimationFrame(anim); return; }
+    /* result */
+    const sl = 360/RSEGS.length;
+    const na = (360-rAngle%360+270)%360;
+    const idx = Math.floor(na/sl)%RSEGS.length;
+    const pass = RSEGS[idx]==='통과';
+    const ring = document.getElementById('spin-result-ring');
+    const st   = document.getElementById('roulette-status');
+    st.style.display='block';
+    if(pass){
+      S.rCombo++;
+      document.getElementById('combo-num').textContent=S.rCombo;
+      ring.textContent='✅'; ring.style.borderColor='#22dd22'; ring.style.background='#002200';
+      st.className='sbox ok'; st.textContent='🎉 '+S.rCombo+'회 통과! 한 번 더!';
+      if(S.rCombo>=2){
+        st.textContent='🔓 탈출 성공!! 빛이 보여!!';
+        spinBtn.style.display='none';
+        document.getElementById('btn-to-trust').style.display='block';
+        S.rSpinning=false;
+        return;
       }
-      setTimeout(()=>{S.rSpinning=false;self.disabled=false;self.textContent='🎰 룰렛을 돌려라!';},600);
+    } else {
+      S.rCombo=0;
+      document.getElementById('combo-num').textContent=0;
+      ring.textContent='💀'; ring.style.borderColor='#ff4444'; ring.style.background='#220000';
+      st.className='sbox bad'; st.textContent='💀 [꽝] 처음부터 다시!';
+      flashScreen('#ff0000',200);
     }
-  })(performance.now());
+    setTimeout(()=>{
+      S.rSpinning=false;
+      spinBtn.disabled=false;
+      spinBtn.style.display='block';
+      spinBtn.textContent='🎰 룰렛을 돌려라!';
+    }, 700);
+  }
+  requestAnimationFrame(anim);
 });
 
 document.getElementById('btn-to-trust').addEventListener('click',()=>{initTrust();goStage('s3');});
