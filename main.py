@@ -73,7 +73,7 @@ def show_img(file_name):
 # --- [0] 시작화면 ---
 if st.session_state.stage == 0:
     st.markdown('<div class="center big-text">👁️ WARNING</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center info-text">게임을 좋아하는 이소연... 허락 없이 들어온 대가는 가혹할 거야..(1부터 20까지 시간을 카운트후 입장.) </div>', unsafe_allow_html=True)
+    st.markdown('<div class="center info-text">게임을 좋아하는 이소연... 허락 없이 들어온 대가는 가혹할 거야../n(1부터 20까지 시간을 카운트후 입장.) </div>', unsafe_allow_html=True)
     if st.button("운명을 확인하기"):
         st.session_state.stage = 1
         st.rerun()
