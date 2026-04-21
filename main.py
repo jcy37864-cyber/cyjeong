@@ -84,23 +84,16 @@ elif st.session_state.stage == 1:
     else:
         if st.button("🚪 다음 통로로 탈출"): st.session_state.stage = 2; st.rerun()
 
-# --- [Stage 2] 문 선택 (수정 완료) ---
 elif st.session_state.stage == 2:
     play_audio("bgm_scary.mp3")
-    
-    # 1. 성공 횟수 표시
     st.markdown(f'<div class="center" style="font-size:30px;">어느 문이 안전할까? 🚪 ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
     
-    # 2. 실패했을 때 (3회 이상)
     if st.session_state.fail >= 3:
         show_img("jumpscare.jpg")
         st.error("잡혔다... 놈이 네 뒤에 있어.")
-        if st.button("🩸 영혼을 다시 꿰매고 재도전"):
+        if st.button("🩸 재도전하기"):
             st.session_state.survive = 0; st.session_state.fail = 0; st.rerun()
-    
-    # 3. 3번 성공하기 전에는 문을 보여줌
     elif st.session_state.survive < 3:
-        if random.random() > 0.7: show_img("scary2.jpg")
         cols = st.columns(3)
         for i in range(3):
             with cols[i]:
@@ -108,28 +101,80 @@ elif st.session_state.stage == 2:
                     if i == st.session_state.safe_choice: st.session_state.survive += 1
                     else: st.session_state.fail += 1
                     st.session_state.safe_choice = random.randint(0, 2); st.rerun()
-    
-    # 4. ★3번 성공 시 - 다른 것들 다 숨기고 탈출 버튼만 크게!★
     else:
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.success("모든 문을 통과했어! 탈출구가 눈앞에 있다!")
-        if st.button("🔦 황금빛 탈출구로 필사적으로 뛰기 🔦"):
+        st.write("")
+        if st.button("🔦 탈출구 발견! 필사적으로 뛰기 🔦"):
             st.session_state.stage = 2.5; st.rerun()
 
-# --- [Stage 2.5] 룰렛 (수정 완료) ---
 elif st.session_state.stage == 2.5:
     play_audio("bgm_scary.mp3")
     st.markdown('<div class="center shake-text">💀 죽음의 룰렛 💀</div>', unsafe_allow_html=True)
     
-    # 결과 메시지 고정 출력
     if st.session_state.last_result:
         st.markdown(f'<div class="status-box center">{st.session_state.last_result}</div>', unsafe_allow_html=True)
     
-    # 룰렛 진행 중일 때
     if not st.session_state.roulette_done:
-        if st.button("🎰 운명을 걸고 룰렛 돌리기 (2연속 성공 필요)"):
+        if st.button("🎰 룰렛 돌리기 (2연속 성공 필요)"):
             with st.spinner("회전 중..."):
                 time.sleep(1)
                 if random.choice(["꽝", "통과", "꽝"]) == "통과":
                     st.session_state.roulette_score += 1
-                    st.session_state.last_result = f"🎉
+                    st.session_state.last_result = f"🎉 {st.session_state.roulette_score}회 성공! 한 번 더!"
+                    if st.session_state.roulette_score >= 2: 
+                        st.session_state.roulette_done = True
+                        st.session_state.last_result = "🔓 봉인 해제! 이제 나갈 수 있어!"
+                else:
+                    st.session_state.roulette_score = 0
+                    st.session_state.last_result = "💀 [꽝] 다시 시작해!"
+                    show_img("jumpscare.jpg")
+            st.rerun()
+    else:
+        if st.button("🩸 열린 문으로 기어나가기"):
+            st.session_state.stage = 3; st.rerun()
+
+elif st.session_state.stage == 3:
+    play_audio("bgm_scary.mp3")
+    st.markdown('<div class="center" style="font-size:25px;">소연아, 나 정말 믿지?</div>', unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🔪 믿어..."):
+            st.session_state.trust_count += 1
+            if st.session_state.trust_count >= 3: st.session_state.stage = 4
+            st.rerun()
+    with col2:
+        if st.button("🕯️ 못 믿겠어"): st.rerun()
+
+elif st.session_state.stage == 4:
+    play_audio("bgm_love.mp3")
+    st.balloons()
+    st.markdown('<div class="center" style="font-size:35px; color:#FF4B4B;">🌹 서프라이즈! 소연아! 🌹</div>', unsafe_allow_html=True)
+    show_img("cute.jpg")
+    if st.button("💝 내 진심을 확인할래?"): st.session_state.stage = 5; st.rerun()
+
+elif st.session_state.stage == 5:
+    play_audio("bgm_love.mp3")
+    st.markdown(f'<div class="center" style="font-size:30px;">마음을 가득 채워줘! 💖 ({st.session_state.heart}/10)</div>', unsafe_allow_html=True)
+    st.progress(st.session_state.heart / 10)
+    cols = st.columns(3)
+    for i in range(3):
+        with cols[i]:
+            if i == st.session_state.heart_choice:
+                if st.button("💖", key=f"h_{i}"):
+                    st.session_state.heart += 1
+                    st.session_state.heart_choice = random.randint(0, 2); st.rerun()
+            else:
+                if st.button("🤍", key=f"e_{i}"): st.session_state.heart_choice = random.randint(0, 2); st.rerun()
+    if st.session_state.heart >= 10:
+        if st.button("🌹 최종 확인 🌹"): st.session_state.stage = 6; st.rerun()
+
+elif st.session_state.stage == 6:
+    play_audio("bgm_love.mp3")
+    st.markdown('<div class="center" style="font-size:30px;">소연아, 평생 함께해줄래?</div>', unsafe_allow_html=True)
+    if st.button("✨ 당연히 YES! ✨"): st.session_state.stage = 7; st.rerun()
+
+elif st.session_state.stage == 7:
+    play_audio("bgm_love.mp3")
+    st.balloons(); show_img("final.jpg")
+    if st.button("처음으로"): 
+        for key in list(st.session_state.keys()): del st.session_state[key]
+        st.rerun()
