@@ -1,166 +1,90 @@
-<!-- ❗ 기존 코드 그대로 두고 아래 3부분만 바꾼 최종본 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💀 SCARE — 소연에게</title>
 
-<!-- ========================= -->
-<!-- ✅ S1 달리기 수정 -->
-<!-- ========================= -->
+<style>
+body{background:#080808;color:#ff2222;font-family:sans-serif;text-align:center;padding:20px;}
+button{padding:10px 20px;margin:10px;font-size:18px;cursor:pointer;}
+</style>
+</head>
 
-<script>
-/* 기존 코드 유지 */
+<body>
 
-function startDashTimer(){
-  clearInterval(S.dashTI);
-  S.dashTimerVal=4;
-  const tw=document.getElementById('dash-timer-wrap');tw.style.display='block';
-  const el=document.getElementById('dash-timer');el.textContent=S.dashTimerVal;
-  S.dashTI=setInterval(()=>{
-    S.dashTimerVal--;el.textContent=S.dashTimerVal;
-    if(S.dashTimerVal<=0){
-      clearInterval(S.dashTI);
+<h1>💀 게임 시작</h1>
 
-      /* 🔥 난이도 ↑ */
-      const p=25+Math.floor(Math.random()*30);
+<div id="stage1">
+<h2>🏃 달리기</h2>
+<p id="dist">200</p>
+<button onclick="run()">달려!</button>
+</div>
 
-      S.dist=Math.min(S.dist+p,350);
-      S.maxDist=Math.max(S.maxDist,S.dist);
+<div id="stage2" style="display:none">
+<h2>🚪 문 선택</h2>
+<p>연속 성공: <span id="streak">0</span> / 2</p>
+<button onclick="door()">문 선택</button>
+</div>
 
-      document.getElementById('dist-num').textContent=S.dist;
-      document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
-
-      document.getElementById('dist-delta').textContent='⚠️ 너무 느려! +'+p+'m 거리 증가!';
-
-      flashScreen('#ff0000',200);
-
-      if(S.stamina>0){
-        S.stamina--;
-        const sb=document.getElementById('sb'+S.stamina);
-        if(sb)sb.classList.remove('alive');
-      }
-
-      if(S.stamina<=0){
-        S.stamina=1;
-        const sb=document.getElementById('sb0');
-        if(sb)sb.classList.add('alive');
-      }
-
-      startDashTimer();
-    }
-  },1000);
-}
-
-document.getElementById('btn-run').addEventListener('click',function(){
-
-  clearInterval(S.dashTI);
-
-  /* 🔥 난이도 ↑ (덜 줄어듦) */
-  const r=10+Math.floor(Math.random()*8);
-
-  S.dist=Math.max(0,S.dist-r);
-
-  document.getElementById('dist-num').textContent=S.dist;
-  document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
-  document.getElementById('dist-delta').textContent='▼ -'+r+'m!';
-
-  if(S.dist<=0){
-    clearInterval(S.dashTI);
-    document.getElementById('dash-timer-wrap').style.display='none';
-    this.style.display='none';
-    document.getElementById('btn-escape-room').style.display='block';
-    document.getElementById('shake-text').textContent='🚪 탈출구가 보여!! 빨리!!';
-  } else {
-    startDashTimer();
-  }
-});
-</script>
-
-<!-- ========================= -->
-<!-- ✅ S2 문짝 수정 -->
-<!-- ========================= -->
-
-<div id="door-streak-box">
-연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">2</span>연속
+<div id="stage3" style="display:none">
+<h2>🎰 룰렛</h2>
+<p>연속 성공: <span id="combo">0</span> / 3</p>
+<button onclick="roulette()">돌려!</button>
 </div>
 
 <script>
-function onDoorClick(d){
+let dist=200;
+let streak=0;
+let combo=0;
 
-  if(d.dataset.used==='1')return;
-  d.dataset.used='1';
+/* ===== 달리기 ===== */
+function run(){
+  let decrease = 10 + Math.floor(Math.random()*8); // 🔥 덜 줄어듦
+  dist -= decrease;
 
-  if(d.dataset.safe==='1'){
-    d.classList.add('correct');
-    S.doorStreak++;
+  let penalty = 25 + Math.floor(Math.random()*30); // 🔥 더 쫓김
+  dist += Math.random()<0.3 ? penalty : 0;
 
-    document.getElementById('streak-num').textContent=S.doorStreak;
-    rotateShadow();
+  document.getElementById("dist").innerText=dist;
 
-    /* 🔥 난이도 ↓ */
-    if(S.doorStreak>=2){
-      setTimeout(()=>{
-        document.getElementById('door-grid').style.display='none';
-        document.getElementById('btn-door-next').style.display='block';
-      },500);
-    } else {
-      setTimeout(buildDoors,600);
-    }
+  if(dist<=0){
+    document.getElementById("stage1").style.display="none";
+    document.getElementById("stage2").style.display="block";
+  }
+}
 
-  } else {
-    d.classList.add('wrong');
-    flashScreen('#ff0000',160);
+/* ===== 문짝 ===== */
+function door(){
+  if(Math.random()<0.5){
+    streak++;
+  }else{
+    streak=0;
+  }
 
-    S.doorStreak=0;
-    document.getElementById('streak-num').textContent=0;
+  document.getElementById("streak").innerText=streak;
 
-    S.doorHP--;
+  if(streak>=2){ // 🔥 4 → 2
+    document.getElementById("stage2").style.display="none";
+    document.getElementById("stage3").style.display="block";
+  }
+}
 
-    if(S.doorHP>=0){
-      const h=document.getElementById('hp'+S.doorHP);
-      if(h){
-        h.classList.add('lost');
-        h.textContent='🖤';
-      }
-    }
+/* ===== 룰렛 ===== */
+function roulette(){
+  if(Math.random()<0.5){
+    combo++;
+  }else{
+    combo=0;
+  }
 
-    if(S.doorHP<=0){
-      document.getElementById('door-grid').style.display='none';
-      document.getElementById('door-dead-box').style.display='block';
-      document.getElementById('btn-retry-door').style.display='block';
-    } else {
-      setTimeout(buildDoors,600);
-    }
+  document.getElementById("combo").innerText=combo;
+
+  if(combo>=3){ // 🔥 2 → 3
+    alert("🎉 성공! 고백 완료!");
   }
 }
 </script>
 
-<!-- ========================= -->
-<!-- ✅ S2.5 룰렛 수정 -->
-<!-- ========================= -->
-
-<div style="text-align:center;font-size:1rem;color:#ff6644;font-weight:700">
-연속 통과: <span id="combo-num">0</span> / 3
-</div>
-
-<script>
-/* 룰렛 결과 */
-if(pass){
-
-  S.rCombo++;
-  document.getElementById('combo-num').textContent=S.rCombo;
-
-  ring.textContent='✅';
-  ring.style.borderColor='#22dd22';
-  ring.style.background='#002200';
-
-  st.className='sbox ok';
-  st.textContent='🎉 '+S.rCombo+'회 통과! 한 번 더!';
-
-  /* 🔥 난이도 ↑ */
-  if(S.rCombo>=3){
-    st.textContent='🔓 탈출 성공!! 빛이 보여!!';
-    self.style.display='none';
-    document.getElementById('btn-to-trust').style.display='block';
-    S.rSpinning=false;
-    return;
-  }
-
-}
-</script>
+</body>
+</html>
