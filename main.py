@@ -1,115 +1,175 @@
 import streamlit as st
 import time
+import os
+import random
 
-st.set_page_config(page_title="For You 💖", page_icon="💌")
+st.set_page_config(page_title="???", page_icon="👁️")
 
-# 상태 관리
+# ================= 상태 =================
 if "stage" not in st.session_state:
     st.session_state.stage = 0
+if "survive" not in st.session_state:
+    st.session_state.survive = 0
+if "heart" not in st.session_state:
+    st.session_state.heart = 0
+if "flash" not in st.session_state:
+    st.session_state.flash = False
 
-# 스타일
+# ================= 스타일 =================
 st.markdown("""
 <style>
+body {background-color: black; color: white;}
 .center {text-align: center;}
-.big {font-size: 32px; font-weight: bold;}
+.big {font-size: 36px; font-weight: bold;}
+.mid {font-size: 24px;}
 .small {font-size:18px;}
-.heart {font-size: 60px; color: red;}
+.scary {color: red; font-size:30px; letter-spacing:2px;}
+.cute {font-size:28px; color:pink;}
+.btn button {width:100%; height:60px; font-size:20px;}
+.blink {animation: blinker 0.7s linear infinite;}
+@keyframes blinker {50% {opacity: 0;}}
 </style>
 """, unsafe_allow_html=True)
 
-# 배경음악
-st.audio("bgm.mp3", autoplay=True)
+# ================= 공통 함수 =================
 
-# ===== 0단계 =====
+def play_bgm():
+    if os.path.exists("bgm.mp3"):
+        st.audio("bgm.mp3", autoplay=True)
+
+
+def flash_screen():
+    st.markdown('<div class="center scary blink">...</div>', unsafe_allow_html=True)
+    time.sleep(0.4)
+
+# ================= 배경음 =================
+play_bgm()
+
+# ================= 0단계 (공포 시작) =================
 if st.session_state.stage == 0:
-    st.image("photo1.jpg", use_column_width=True)
-    st.markdown('<div class="center big">너를 위한 작은 게임 🎮</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center small">끝까지 가면... 비밀이 있어 💖</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center scary">들어오지 말았어야 했어</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">이건 단순한 게임이 아니야</div>', unsafe_allow_html=True)
 
-    if st.button("시작하기 💌"):
+    if st.button("들어간다..."):
         st.session_state.stage = 1
 
-# ===== 1단계 =====
+# ================= 1단계 (공포 선택) =================
 elif st.session_state.stage == 1:
-    st.image("photo2.jpg", use_column_width=True)
-    st.markdown('<div class="center">Q1. 우리가 처음 만난 계절은?</div>', unsafe_allow_html=True)
+    flash_screen()
+    st.markdown('<div class="center scary">지금 나갈 수 있을까?</div>', unsafe_allow_html=True)
 
-    answer = st.radio("", ["봄 🌸", "여름 🌊", "가을 🍁", "겨울 ❄️"])
+    choice = st.radio("", ["나간다", "계속한다"])
 
-    if st.button("다음 👉"):
-        if answer == "봄 🌸":
-            st.session_state.stage = 2
-        else:
-            st.warning("힌트: 벚꽃이 있었어 🌸")
+    if st.button("선택"):
+        st.warning("이미 시작됐어...")
+        time.sleep(1)
+        st.session_state.stage = 2
 
-# ===== 2단계 (미니게임) =====
+# ================= 2단계 (생존 게임) =================
 elif st.session_state.stage == 2:
-    st.markdown('<div class="center big">하트 잡기 게임 💖</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center small">3번 잡으면 성공!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big">생존 게임</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">버튼 중 하나만 안전하다</div>', unsafe_allow_html=True)
 
-    if "score" not in st.session_state:
-        st.session_state.score = 0
+    cols = st.columns(3)
+    safe = random.randint(0, 2)
 
-    if st.button("💖 잡기"):
-        st.session_state.score += 1
+    for i in range(3):
+        with cols[i]:
+            if st.button(f"버튼 {i+1}"):
+                if i == safe:
+                    st.success("살아남았다...")
+                    st.session_state.survive += 1
+                else:
+                    st.error("잡혔다...")
+                    st.session_state.survive = 0
 
-    st.markdown(f'<div class="center">점수: {st.session_state.score} / 3</div>', unsafe_allow_html=True)
+    st.write(f"생존: {st.session_state.survive}/3")
 
-    if st.session_state.score >= 3:
-        st.success("성공! 🎉")
-        if st.button("다음으로 👉"):
+    if st.session_state.survive >= 3:
+        if st.button("다음..."):
             st.session_state.stage = 3
 
-# ===== 3단계 =====
+# ================= 3단계 (심리 질문) =================
 elif st.session_state.stage == 3:
-    st.image("photo3.jpg", use_column_width=True)
-    st.markdown('<div class="center">Q2. 내가 제일 좋아하는 너의 모습은?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">나를 믿어?</div>', unsafe_allow_html=True)
+    ans = st.radio("", ["믿는다", "못 믿는다"])
 
-    answer = st.radio("", ["웃는 모습 😊", "화난 모습 😤", "졸린 모습 😪"])
+    if st.button("다음"):
+        st.session_state.stage = 4
 
-    if st.button("다음 👉"):
-        if answer == "웃는 모습 😊":
-            st.session_state.stage = 4
-        else:
-            st.warning("정답은 항상 웃는 모습 😊")
-
-# ===== 4단계 =====
+# ================= 4단계 (반전 연출) =================
 elif st.session_state.stage == 4:
-    st.markdown('<div class="center big">마지막이야...</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">...</div>', unsafe_allow_html=True)
+    time.sleep(1)
+    st.markdown('<div class="center">......</div>', unsafe_allow_html=True)
     time.sleep(1)
 
-    st.markdown('<div class="center">나와 함께한 시간, 어땠어?</div>', unsafe_allow_html=True)
-    answer = st.radio("", ["행복했어 💖", "그럭저럭 🙂", "별로야 😢"])
+    st.balloons()
+    st.markdown('<div class="center cute">짜잔 😆</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">속았지? 이제부터 진짜야 💖</div>', unsafe_allow_html=True)
 
-    if st.button("결과 보기 💌"):
+    if st.button("다음 💖"):
         st.session_state.stage = 5
 
-# ===== 5단계 (고백) =====
+# ================= 5단계 (하트 게임) =================
 elif st.session_state.stage == 5:
-    st.image("photo4.jpg", use_column_width=True)
-    st.markdown('<div class="center heart">❤️</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center cute">하트를 잡아줘 💖</div>', unsafe_allow_html=True)
+
+    cols = st.columns(3)
+    heart_pos = random.randint(0, 2)
+
+    for i in range(3):
+        with cols[i]:
+            if i == heart_pos:
+                if st.button("💖"):
+                    st.session_state.heart += 1
+            else:
+                if st.button("🖤"):
+                    st.warning("이건 아니야 😆")
+
+    st.write(f"하트: {st.session_state.heart}/5")
+
+    if st.session_state.heart >= 5:
+        if st.button("다음 👉"):
+            st.session_state.stage = 6
+
+# ================= 6단계 (웃김) =================
+elif st.session_state.stage == 6:
+    st.markdown('<div class="center">중요한 질문 😏</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big">나는 어떤 사람?</div>', unsafe_allow_html=True)
+
+    ans = st.radio("", ["잘생김 😎", "귀여움 🐶", "완벽 💯", "다 맞음"])
+
+    if st.button("정답"):
+        st.success("정답: 다 맞음 ㅋㅋ")
+        time.sleep(1)
+        st.session_state.stage = 7
+
+# ================= 7단계 (고백 연출) =================
+elif st.session_state.stage == 7:
+    st.markdown('<div class="center big">사실은...</div>', unsafe_allow_html=True)
     time.sleep(1)
 
-    st.markdown('<div class="center big">사실 이건 게임이 아니라...</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">처음부터 너를 위한 거였어</div>', unsafe_allow_html=True)
     time.sleep(1)
 
-    st.markdown('<div class="center big">내 마음이야</div>', unsafe_allow_html=True)
-    time.sleep(1)
+    st.markdown('<div class="center">이상한 게임 같았지?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center">근데 전부 내 진심이야</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="center">처음 만난 날부터 계속 좋아했어</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center">너랑 있는 시간이 제일 행복해</div>', unsafe_allow_html=True)
-    st.markdown('<div class="center big">나랑 계속 함께해줄래? 💍</div>', unsafe_allow_html=True)
+    time.sleep(1)
+    st.markdown('<div class="center cute">너 좋아해 💖</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center big">나랑 계속 함께해줄래?</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
     with col1:
         if st.button("YES 💖"):
             st.balloons()
-            st.success("고마워... 진짜 잘할게 💖")
+            st.success("진짜 행복하다 💖")
 
     with col2:
         if st.button("NO 😢"):
-            st.warning("다시 생각해줄래...? 🥺")
+            st.warning("다시 생각해줘...🥺")
 
-# 하단
+# ================= 하단 =================
 st.markdown('<div class="center small">Made with ❤️</div>', unsafe_allow_html=True)
