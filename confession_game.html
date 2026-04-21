@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💀 SCARE — 소연에게</title>
+<title>💀 SCARE — 소연에게 (HARD MODE)</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ... (기존 스타일 코드 유지) ... */
 :root {
   --h-bg:#080808;--h-text:#ff2222;--h-dim:#991111;
   --l-bg:#fff5f7;--l-text:#c0194a;--l-accent:#ff4b7b;
@@ -34,508 +33,350 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
   transition:all .16s ease;}
 .btn-horror{background:#0f0f0f;color:var(--h-text);border:2px solid var(--h-dim);}
 .btn-horror:hover{background:#1a0000;border-color:var(--h-text);transform:scale(1.02);box-shadow:0 0 18px rgba(255,34,34,.3);}
-.btn-horror:active{transform:scale(.97);}
-.btn-horror:disabled{opacity:.35;cursor:not-allowed;transform:none;}
 .btn-love{background:#fff0f3;color:var(--l-text);border:2px solid var(--l-accent);}
-.btn-love:hover{background:#ffe0e8;transform:scale(1.02);box-shadow:0 4px 18px rgba(255,75,123,.22);}
-.btn-love:active{transform:scale(.97);}
+.btn-love:hover{background:#ffe0e8;transform:scale(1.02);}
 .prog-wrap{background:#1a0000;border-radius:99px;height:13px;overflow:hidden;border:1px solid #330000;}
-.prog-bar{height:100%;background:linear-gradient(90deg,#ff0000,#ff6644);border-radius:99px;transition:width .35s ease;}
+.prog-bar{height:100%;background:linear-gradient(90deg,#ff0000,#ff6644);border-radius:99px;transition:width .1s ease;}
 .prog-wrap.love{background:#ffe0e8;border-color:#ffc0cc;}
 .prog-wrap.love .prog-bar{background:linear-gradient(90deg,#ff4b7b,#ff90b0);}
 .sbox{border:2px solid var(--h-dim);background:#0a0000;border-radius:10px;
-  padding:1rem 1.2rem;font-size:1rem;font-weight:700;text-align:center;line-height:1.6;transition:all .3s;}
-.sbox.ok{border-color:#22dd22;color:#22dd22;}
-.sbox.bad{border-color:#ff4444;color:#ff4444;}
-.sbox.love{border-color:var(--l-accent);background:#fff0f3;color:var(--l-text);}
+  padding:1rem 1.2rem;font-size:1rem;font-weight:700;text-align:center;line-height:1.6;}
 .img-box{width:100%;border-radius:12px;overflow:hidden;border:3px solid #220000;background:#111;}
 .img-box img{width:100%;display:block;object-fit:cover;max-height:300px;}
-.img-ph{width:100%;height:180px;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:.4rem;color:#444;font-size:.82rem;text-align:center;padding:1rem;}
-.img-ph .ic{font-size:2.2rem;}
-.img-box.love-frame{border-color:var(--l-accent);}
-.load-bar-outer{background:#111;border-radius:99px;height:18px;overflow:hidden;border:1px solid #330000;}
-.load-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#660000,#ff0000);border-radius:99px;transition:width .08s linear;}
-.load-msg{font-size:.88rem;color:#666;text-align:center;min-height:1.2em;}
+.img-ph{width:100%;height:180px;display:flex;align-items:center;justify-content:center;color:#444;font-size:2.2rem;}
 .shake{display:inline-block;animation:shake .32s infinite;font-family:var(--font-main);
-  font-size:clamp(1.5rem,5.5vw,2rem);color:var(--h-text);text-shadow:0 0 18px rgba(255,0,0,.6);text-align:center;}
-@keyframes shake{
-  0%{transform:translate(3px,2px) rotate(-.5deg)}25%{transform:translate(-4px,-2px) rotate(.5deg)}
-  50%{transform:translate(4px,-3px) rotate(-.3deg)}75%{transform:translate(-3px,3px) rotate(.4deg)}
-  100%{transform:translate(3px,-2px) rotate(-.2deg)}}
-@keyframes flicker{0%,90%,100%{opacity:1}91%{opacity:.5}93%{opacity:1}95%{opacity:.25}97%{opacity:1}}
+  font-size:clamp(1.5rem,5.5vw,2.1rem);color:var(--h-text);text-align:center;}
+@keyframes shake{0%{transform:translate(3px,2px)}50%{transform:translate(-4px,-3px)}100%{transform:translate(3px,-2px)}}
+@keyframes flicker{0%,90%,100%{opacity:1}91%{opacity:.5}95%{opacity:.25}}
 .flash-overlay{position:fixed;inset:0;background:#ff0000;opacity:0;pointer-events:none;z-index:9000;transition:opacity .05s;}
 #balloon-wrap{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden;}
 .balloon{position:absolute;bottom:-60px;animation:rise linear forwards;}
 @keyframes rise{to{transform:translateY(-110vh) rotate(20deg);opacity:0;}}
-#audio-notice{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);
-  border-radius:99px;padding:.4rem 1.1rem;font-size:.78rem;color:#777;
-  pointer-events:none;transition:opacity .5s;z-index:100;}
-#stamina-wrap{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
-.stamina-block{width:26px;height:26px;border-radius:5px;background:#1a0000;border:1px solid #330000;transition:background .2s;}
-.stamina-block.alive{background:#ff2200;border-color:#ff4400;box-shadow:0 0 6px rgba(255,34,0,.4);}
-.dist-big{font-family:var(--font-main);font-size:2.2rem;text-align:center;color:#ff2222;}
-#dist-delta{font-size:.9rem;color:#ff6644;text-align:center;min-height:1.2em;}
-#dash-timer-wrap{text-align:center;}
-.countdown-ring{font-family:var(--font-main);font-size:3.5rem;color:#ff2222;line-height:1;}
-#dash-timer-label{font-size:.8rem;color:#555;margin-top:-.3rem;}
+.dist-big{font-family:var(--font-main);font-size:2.5rem;text-align:center;color:#ff2222;}
+.countdown-ring{font-family:var(--font-main);font-size:3.5rem;color:#ff2222;text-align:center;}
 .door-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-.door-card{aspect-ratio:.55/1;border-radius:10px 10px 3px 3px;border:2px solid #2a0000;
-  background:#0a0000;cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;justify-content:flex-end;padding-bottom:.6rem;
-  transition:all .18s;font-family:var(--font-main);font-size:.8rem;color:#440000;}
-.door-card:hover{border-color:#ff2222;background:#150000;transform:translateY(-4px);box-shadow:0 0 14px rgba(255,0,0,.25);}
-.door-card.correct{border-color:#22dd22!important;background:#001500!important;animation:dPulse .4s ease;}
+.door-card{aspect-ratio:.55/1;border-radius:10px;border:2px solid #2a0000;background:#0a0000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
 .door-card.wrong{animation:dWrong .35s ease;}
-.door-card .di{font-size:1.8rem;margin-bottom:.2rem;}
-@keyframes dPulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
 @keyframes dWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-.shadow-creature{font-size:3rem;text-align:center;animation:cFloat 2s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(255,0,0,.6));}
-@keyframes cFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-#door-hp-wrap{display:flex;gap:6px;justify-content:center;}
-.hp-heart{font-size:1.3rem;transition:filter .3s;}
-.hp-heart.lost{filter:grayscale(1) opacity(.3);}
-#door-streak-box{text-align:center;font-size:.95rem;font-weight:700;color:#ff6644;}
 #roulette-canvas-wrap{display:flex;justify-content:center;position:relative;}
-#roulette-canvas{border-radius:50%;display:block;filter:drop-shadow(0 0 16px rgba(255,0,0,.4));}
-#roulette-needle{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
-  width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
-  border-bottom:30px solid #ffff00;filter:drop-shadow(0 0 4px rgba(255,255,0,.8));z-index:10;}
-#spin-result-ring{width:110px;height:110px;border-radius:50%;border:4px solid #330000;
-  display:flex;align-items:center;justify-content:center;font-size:2rem;
-  margin:0 auto;transition:border-color .3s,background .3s;}
-#trust-phrase{font-family:var(--font-main);font-size:1.4rem;text-align:center;
-  color:#ff2222;letter-spacing:.1em;line-height:1.8;}
-#trust-input{width:100%;padding:.9rem 1rem;background:#0a0000;border:2px solid #440000;
-  border-radius:10px;color:#ff6644;font-family:var(--font-main);font-size:1.2rem;
-  letter-spacing:.1em;text-align:center;outline:none;transition:border-color .2s;}
-#trust-input:focus{border-color:#ff2222;}
-#trust-progress-wrap{display:flex;gap:8px;justify-content:center;}
-.trust-dot{width:18px;height:18px;border-radius:50%;border:2px solid #440000;background:transparent;transition:all .3s;}
-.trust-dot.done{background:var(--h-text);border-color:var(--h-text);box-shadow:0 0 8px rgba(255,0,0,.5);}
-#trust-msg{font-size:.9rem;text-align:center;color:#555;min-height:1.2em;}
-#trust-err-msg{font-size:.88rem;text-align:center;color:#ff4444;min-height:1.2em;}
+#roulette-canvas{border-radius:50%;filter:drop-shadow(0 0 16px rgba(255,0,0,.4));}
+#roulette-needle{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:30px solid #ffff00;z-index:10;}
+#spin-result-ring{width:110px;height:110px;border-radius:50%;border:4px solid #330000;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:1rem auto;}
 .heart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.heart-cell{aspect-ratio:1;border-radius:10px;border:2px solid #ffc0cc;background:#fff5f7;
-  display:flex;align-items:center;justify-content:center;font-size:1.8rem;
-  cursor:pointer;transition:all .18s;}
-.heart-cell:hover{transform:scale(1.08);}
-.heart-cell.glow{animation:hPop .3s ease;}
-@keyframes hPop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
-#heart-num-big{font-family:var(--font-main);font-size:2.5rem;text-align:center;color:var(--l-accent);}
-#thread-arena{position:relative;width:100%;height:360px;background:#030010;
-  border-radius:14px;border:2px solid #1a0030;overflow:hidden;}
-.thread-item{position:absolute;cursor:pointer;user-select:none;font-size:clamp(1.5rem,4vw,2.1rem);
-  filter:drop-shadow(0 0 5px rgba(200,0,255,.5));animation:tFloat linear infinite;}
-.thread-item:hover{transform:scale(1.18)!important;}
-@keyframes tFloat{0%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}100%{transform:translateY(0) rotate(-3deg)}}
-.thread-real{filter:drop-shadow(0 0 8px rgba(255,0,180,.8))!important;animation:rPulse 1.2s ease infinite!important;}
-@keyframes rPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(255,0,180,.6))}50%{filter:drop-shadow(0 0 20px rgba(255,0,200,1));}}
-#thread-hint{font-size:.9rem;text-align:center;color:#554455;min-height:1.3em;}
-#thread-attempts{text-align:center;font-size:.9rem;color:#772222;font-weight:700;}
-.thread-spark{position:absolute;pointer-events:none;z-index:10;font-size:1.5rem;
-  animation:sBurst .65s ease forwards;}
-@keyframes sBurst{0%{opacity:1;transform:scale(.4) translate(0,0)}100%{opacity:0;transform:scale(2) translate(var(--dx),var(--dy))}}
-#proposal-arena{position:relative;height:160px;overflow:hidden;}
-#no-btn{position:absolute;width:38%;transition:top .12s ease,left .12s ease;}
-#no-escape-msg{font-size:.85rem;text-align:center;color:#553333;min-height:1.2em;}
-.ending-text{font-family:var(--font-main);font-size:1.3rem;text-align:center;color:var(--l-accent);line-height:1.8;}
+.heart-cell{aspect-ratio:1;border-radius:10px;border:2px solid #ffc0cc;background:#fff5f7;display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;}
+#thread-arena{position:relative;width:100%;height:380px;background:#030010;border-radius:14px;border:2px solid #1a0030;overflow:hidden;}
+.thread-item{position:absolute;cursor:pointer;font-size:2rem;filter:drop-shadow(0 0 5px rgba(200,0,255,.5));}
+#proposal-arena{position:relative;height:160px;}
+#no-btn{position:absolute;width:38%;transition:all .1s ease;}
 </style>
 </head>
 <body>
+
 <div id="game">
-<div class="stage active" id="s0">
-  <div class="title-horror" style="font-size:clamp(1.4rem,5vw,2.1rem)">👁️ SYSTEM BREACH IN PROGRESS</div>
-  <div class="subtitle" style="color:#3a3a3a">소연이의 데이터에 강제 침투 중...</div>
-  <div id="load-wrap" style="display:none;flex-direction:column;gap:1rem;">
-    <div class="load-bar-outer"><div class="load-bar-inner" id="load-bar"></div></div>
-    <div class="load-msg" id="load-msg">대기 중...</div>
+  <div class="stage active" id="s0">
+    <div class="title-horror">👁️ SYSTEM BREACH</div>
+    <div class="subtitle">소연이의 데이터를 강제 복구 중...</div>
+    <button class="btn btn-horror" id="btn-s0-start">🩸 데이터 복구 시작</button>
+    <button class="btn btn-horror" id="btn-s0-enter" style="display:none">💀 어둠 속으로 입장</button>
   </div>
-  <button class="btn btn-horror" id="btn-s0-start">🩸 권한 강제 탈취 (이소연)</button>
-  <button class="btn btn-horror" id="btn-s0-enter" style="display:none">💀 어둠의 심연으로 입장</button>
-  <p style="font-size:.75rem;color:#2a2a2a;text-align:center">※ 소리는 클릭 후 켜집니다</p>
-</div>
 
-<div class="stage" id="s1">
-  <div class="shake" id="shake-text">🔪 소연아!! 뒤를 봐!! 🔪</div>
-  <div class="img-box" id="img-scary"><div class="img-ph"><div class="ic">👁️</div><div>scary.jpg</div></div></div>
-  <div class="dist-big">🏃 <span id="dist-num">100</span>m</div> <div id="dist-delta">&nbsp;</div>
-  <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
-  <div id="dash-timer-wrap" style="display:none">
-    <div class="countdown-ring" id="dash-timer">10</div> <div id="dash-timer-label">이 안에 클릭 안 하면 거리 증가!!</div>
+  <div class="stage" id="s1">
+    <div class="shake">🔪 소연아!! 뒤를 봐!! 🔪</div>
+    <div class="img-box"><div class="img-ph">👁️ scary.jpg</div></div>
+    <div class="dist-big">🏃 <span id="dist-num">200</span>m</div>
+    <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
+    <div class="countdown-ring" id="dash-timer">4</div>
+    <div style="text-align:center; font-size:0.8rem; opacity:0.5;">4초마다 귀신이 15m씩 접근합니다!</div>
+    <button class="btn btn-horror" id="btn-run">🏃 광클해서 도망쳐!!</button>
+    <button class="btn btn-horror" id="btn-escape-room" style="display:none">🚪 탈출구 발견!</button>
   </div>
-  <div id="stamina-wrap"></div>
-  <button class="btn btn-horror" id="btn-run" style="font-size:1.5rem;padding:1.2rem">🏃 달려!! 달려!! (클릭!)</button>
-  <button class="btn btn-horror" id="btn-escape-room" style="display:none">🚪 탈출구로 질주!!</button>
-</div>
 
-<div class="stage" id="s2">
-  <div class="title-horror" style="font-size:1.45rem">🚪 그림자 뒤의 진실</div>
-  <div class="shadow-creature" id="shadow-creature">👾</div>
-  <div id="door-streak-box">연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">2</span>연속</div> <div id="door-hp-wrap">
-    <span class="hp-heart" id="hp0">❤️</span>
-    <span class="hp-heart" id="hp1">❤️</span>
-    <span class="hp-heart" id="hp2">❤️</span>
-    <span class="hp-heart" id="hp3">❤️</span>
-    <span class="hp-heart" id="hp4">❤️</span> </div>
-  <div class="door-grid" id="door-grid"></div>
-  <div class="sbox bad" id="door-dead-box" style="display:none">💀 그림자에게 삼켜졌다...</div>
-  <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 다시 일어서</button>
-  <button class="btn btn-horror" id="btn-door-next" style="display:none">🔦 탈출구로!!</button>
-</div>
-
-<div class="stage" id="s25">
-  <div class="shake" style="font-size:1.8rem">💀 죽음의 룰렛 💀</div>
-  <div class="subtitle">1회 통과하면 탈출!</div> <div id="roulette-canvas-wrap">
-    <canvas id="roulette-canvas" width="260" height="260"></canvas>
-    <div id="roulette-needle"></div>
+  <div class="stage" id="s2">
+    <div class="title-horror">🚪 그림자 문</div>
+    <div style="text-align:center">연속 성공: <span id="streak-num">0</span> / 4</div>
+    <div style="text-align:center" id="door-hp-wrap">목숨: ❤️❤️❤️</div>
+    <div class="door-grid" id="door-grid"></div>
+    <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 재도전</button>
+    <button class="btn btn-horror" id="btn-door-next" style="display:none">🔦 다음 단계로</button>
   </div>
-  <div id="spin-result-ring">❓</div>
-  <div id="roulette-status" class="sbox" style="display:none"></div>
-  <div style="text-align:center;font-size:1rem;color:#ff6644;font-weight:700">성공 시 즉시 탈출!</div>
-  <button class="btn btn-horror" id="roulette-spin-btn">🎰 룰렛을 돌려라!</button>
-  <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 틈으로 기어나가기</button>
-</div>
 
-<div class="stage" id="s3">
-  <div class="title-horror" style="font-size:1.35rem">소연아, 날 진짜 믿는다면...</div>
-  <div class="subtitle" style="color:#553333">아래 문장을 정확히 입력해봐</div>
-  <div id="trust-phrase"></div>
-  <input id="trust-input" type="text" autocomplete="off" spellcheck="false" placeholder="여기에 입력...">
-  <div id="trust-progress-wrap">
-    <div class="trust-dot" id="td0"></div>
-    <div class="trust-dot" id="td1"></div>
-    <div class="trust-dot" id="td2"></div>
+  <div class="stage" id="s25">
+    <div class="shake">💀 죽음의 룰렛 💀</div>
+    <div class="subtitle">단 1칸만이 통과입니다.</div>
+    <div id="roulette-canvas-wrap">
+      <canvas id="roulette-canvas" width="260" height="260"></canvas>
+      <div id="roulette-needle"></div>
+    </div>
+    <div id="spin-result-ring">❓</div>
+    <button class="btn btn-horror" id="roulette-spin-btn">🎰 돌려라! (운명에 맡기기)</button>
+    <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 틈으로 탈출</button>
   </div>
-  <div id="trust-msg">1 / 3 완료</div>
-  <div id="trust-err-msg">&nbsp;</div>
-</div>
 
-<div class="stage" id="s4">
-  <div class="title-love">🌹 서프라이즈! 소연아! 🌹</div>
-  <div class="img-box love-frame" id="img-cute"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">🌸</div><div>cute.jpg</div></div></div>
-  <button class="btn btn-love" id="btn-to-heart">💖 나의 진심을 확인할래?</button>
-</div>
-
-<div class="stage" id="s5">
-  <div class="title-love" style="font-size:1.5rem">내 마음을 받아줘! 💖</div>
-  <div id="heart-num-big"><span id="heart-num">0</span> / 6</div> <div class="prog-wrap love"><div class="prog-bar" id="heart-bar" style="width:0%"></div></div>
-  <div class="heart-grid" id="heart-grid"></div>
-  <button class="btn btn-love" id="btn-to-thread" style="display:none">🧵 운명의 붉은 실을 찾아...</button>
-</div>
-
-<div class="stage" id="s6">
-  <div class="title-horror" style="font-size:1.45rem;color:#dd00bb;text-shadow:0 0 20px rgba(220,0,180,.5)">🧵 운명의 붉은 실</div>
-  <div id="thread-arena"></div>
-  <div id="thread-hint">&nbsp;</div>
-  <div id="thread-attempts">남은 기회: <span id="thread-tries">15</span></div> <button class="btn btn-horror" id="btn-thread-retry" style="display:none">🩸 다시 도전</button>
-  <button class="btn btn-horror" id="btn-thread-next" style="display:none">💌 마지막 고백으로...</button>
-</div>
-
-<div class="stage" id="s7">
-  <div class="title-love">소연아, 영원히 나랑 함께해줄래?</div>
-  <div id="proposal-arena">
-    <button class="btn btn-love" id="yes-btn" style="position:absolute;width:52%;top:50%;left:8%;transform:translateY(-50%)">✨ 100% YES! ✨</button>
-    <button class="btn btn-horror" id="no-btn">NO</button>
+  <div class="stage" id="s3">
+    <div class="title-horror">날 믿어?</div>
+    <div id="trust-phrase" style="text-align:center; font-size:1.5rem; margin-bottom:1rem;"></div>
+    <input id="trust-input" type="text" style="width:100%; padding:1rem; background:#111; color:red; border:2px solid red; text-align:center; font-size:1.2rem;" placeholder="똑같이 입력하세요">
   </div>
-  <div id="no-escape-msg">&nbsp;</div>
+
+  <div class="stage" id="s4">
+    <div class="title-love">🌹 반전! 소연아! 🌹</div>
+    <div class="img-box"><div class="img-ph">🌸 cute.jpg</div></div>
+    <button class="btn btn-love" id="btn-to-heart">💖 내 진심을 확인해줘</button>
+  </div>
+
+  <div class="stage" id="s5">
+    <div class="title-love">내 마음을 모아줘! 💖</div>
+    <div style="text-align:center; font-size:1.5rem; margin-bottom:1rem;">수집된 하트: <span id="heart-num">0</span> / 18</div>
+    <div style="text-align:center; font-size:0.8rem; color:red; margin-bottom:0.5rem;">※ 빈 하트(🤍)를 누르면 -1개 감점!</div>
+    <div class="heart-grid" id="heart-grid"></div>
+    <button class="btn btn-love" id="btn-to-thread" style="display:none">🧵 운명의 실 찾기</button>
+  </div>
+
+  <div class="stage" id="s6">
+    <div class="title-horror" style="color:#dd00bb;">🧵 운명의 붉은 실</div>
+    <div class="subtitle" style="color:#aaa;">수많은 실 중 우리를 잇는 실은 단 하나.<br>신중하게 선택해.</div>
+    <div id="thread-arena"></div>
+    <div style="text-align:center; font-weight:bold;">남은 기회: <span id="thread-tries">3</span></div>
+    <button class="btn btn-horror" id="btn-thread-retry" style="display:none">🩸 실이 끊어졌다.. 다시 하기</button>
+    <button class="btn btn-horror" id="btn-thread-next" style="display:none">💌 마지막으로...</button>
+  </div>
+
+  <div class="stage" id="s7">
+    <div class="title-love">소연아, 나랑 만나줄래?</div>
+    <div id="proposal-arena">
+      <button class="btn btn-love" id="yes-btn" style="position:absolute; width:50%; left:5%; top:40%;">YES! 😍</button>
+      <button class="btn btn-horror" id="no-btn">NO</button>
+    </div>
+  </div>
+
+  <div class="stage" id="s8">
+    <div class="title-love">🎉 오늘부터 1일! 🎉</div>
+    <div class="img-box"><div class="img-ph">💑 final.jpg</div></div>
+    <button class="btn btn-love" id="btn-restart">다시 하기</button>
+  </div>
 </div>
 
-<div class="stage" id="s8">
-  <div class="title-love">🎉 우리의 새로운 시작! 🎉</div>
-  <div class="img-box love-frame" id="img-final"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">💑</div><div>final.jpg</div></div></div>
-  <div class="ending-text">이 모든 공포를 뚫고도<br>여기까지 왔어. 수고했어, 소연아 💖</div>
-  <div class="sbox love">우리의 이야기가 시작됐어! 🌹</div>
-  <button class="btn btn-love" id="btn-restart">처음으로 돌아가기</button>
-</div>
-
-</div>
-
-<audio id="aud-scary" loop preload="auto"><source src="bgm_scary.mp3" type="audio/mpeg"></audio>
-<audio id="aud-love"  loop preload="auto"><source src="bgm_love.mp3"  type="audio/mpeg"></audio>
+<audio id="aud-scary" loop><source src="bgm_scary.mp3" type="audio/mpeg"></audio>
+<audio id="aud-love" loop><source src="bgm_love.mp3" type="audio/mpeg"></audio>
 <div id="balloon-wrap"></div>
 <div class="flash-overlay" id="flash"></div>
-<div id="audio-notice">🔇 아무 곳이나 클릭하면 소리가 켜져요</div>
 
 <script>
-/* ════ 난이도 하향 조정된 스크립트 ════ */
 const S = {
-  audioUnlocked:false, currentAudio:null,
-  dist:100, maxDist:100, stamina:8, // 스테미나 증가, 거리 단축
-  dashTimerVal:0, dashTI:null,
-  doorStreak:0, doorHP:5, // 목숨 5개
-  rCombo:0, rSpinning:false,
-  trustDone:0, trustIdx:0,
-  heartCount:0,
-  threadTries:15, threadFound:false, threadLocked:false, // 실 찾기 기회 15회
-  noEscapes:0,
+  dist:200, dashTimer:4, doorHP:3, doorStreak:0, heart:0, threadTries:3,
+  audioUnlocked: false
 };
 
-/* [이하 로직 수정 포인트] */
-// 1. DASH 로직: 달리기 속도 대폭 상향
-document.getElementById('btn-run')?.addEventListener('click', function(){
-  clearInterval(S.dashTI);
-  const r = 25 + Math.floor(Math.random() * 15); // 한 번에 줄어드는 거리 대폭 증가
-  S.dist = Math.max(0, S.dist - r);
-  /* ... (UI 업데이트 로직) ... */
-  document.getElementById('dist-num').textContent = S.dist;
-  document.getElementById('dist-bar').style.width = (S.dist / S.maxDist * 100) + '%';
-  if(S.dist <= 0) { 
-    document.getElementById('btn-run').style.display='none';
-    document.getElementById('btn-escape-room').style.display='block';
-    document.getElementById('dash-timer-wrap').style.display='none';
-  } else { startDashTimer(); }
-});
-
-function startDashTimer(){
-  clearInterval(S.dashTI);
-  S.dashTimerVal = 10; // 10초 대기 시간
-  const el = document.getElementById('dash-timer');
-  if(el) el.textContent = S.dashTimerVal;
-  S.dashTI = setInterval(()=>{
-    S.dashTimerVal--;
-    if(el) el.textContent = S.dashTimerVal;
-    if(S.dashTimerVal <= 0){
-      clearInterval(S.dashTI);
-      S.dist = Math.min(S.dist + 5, 150); // 패널티 거리를 최소화 (5m만 증가)
-      startDashTimer();
-    }
-  },1000);
-}
-
-// 2. ROULETTE 로직: 꽝 확률 대폭 감소 (8개 중 1개만 꽝)
-const RSEGS=['통과','통과','통과','꽝','통과','통과','통과','통과']; 
-
-// [나머지 필수 함수들은 기존과 동일하게 유지 - 작동 보장]
-const audS=document.getElementById('aud-scary'),audL=document.getElementById('aud-love');
-audS.volume=.45; audL.volume=.5;
-function unlockAudio(){
-  if(S.audioUnlocked)return; S.audioUnlocked=true;
-  document.getElementById('audio-notice').style.opacity='0';
-  if(S.currentAudio) S.currentAudio.play().catch(()=>{});
-}
-document.addEventListener('click',unlockAudio,{once:true});
-function switchAudio(t){
-  if(t==='scary'){if(!audS.paused)return;audL.pause();S.currentAudio=audS;if(S.audioUnlocked)audS.play().catch(()=>{});}
-  else{if(!audL.paused)return;audS.pause();S.currentAudio=audL;if(S.audioUnlocked)audL.play().catch(()=>{});}
-}
-function goStage(id){
+// --- 공통 기능 ---
+function go(id){
   document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-  if(['s4','s5','s6','s7','s8'].includes(id)){document.body.classList.add('love-mode');switchAudio('love');}
-  else if(id!=='s0'){document.body.classList.remove('love-mode');switchAudio('scary');}
-}
-function tryLoadImg(id,src){
-  const w=document.getElementById(id);if(!w)return;
-  const i=new Image();i.onload=()=>{w.innerHTML=`<img src="${src}" alt="">`;};i.src=src;
-}
-function flashScreen(col,dur){
-  const f=document.getElementById('flash');f.style.background=col||'#ff0000';f.style.opacity='.5';
-  setTimeout(()=>f.style.opacity='0',dur||120);
-}
-function launchBalloons(){
-  const w=document.getElementById('balloon-wrap');
-  const em=['🎈','💖','🌹','✨','💕','🎉','🫀','🌸'];
-  for(let i=0;i<22;i++){
-    const b=document.createElement('div');b.className='balloon';
-    b.textContent=em[Math.floor(Math.random()*em.length)];
-    b.style.left=Math.random()*100+'vw';
-    b.style.animationDuration=(2.2+Math.random()*3)+'s';
-    b.style.animationDelay=(Math.random()*1.8)+'s';
-    b.style.fontSize=(1.3+Math.random()*1.6)+'rem';
-    w.appendChild(b); b.addEventListener('animationend',()=>b.remove());
+  if(['s4','s5','s6','s7','s8'].includes(id)){
+    document.body.classList.add('love-mode');
+    document.getElementById('aud-scary').pause();
+    if(S.audioUnlocked) document.getElementById('aud-love').play();
+  } else {
+    if(S.audioUnlocked && id!=='s0') document.getElementById('aud-scary').play();
   }
 }
 
-let loadDone=false;
-document.getElementById('btn-s0-start').addEventListener('click',function(){
-  if(loadDone)return;
-  this.disabled=true;this.style.opacity='.35';
-  document.getElementById('load-wrap').style.display='flex';
-  const bar=document.getElementById('load-bar'),msg=document.getElementById('load-msg');
-  const msgs=['영혼의 주파수 맞추는 중...','어둠의 경로 탐색 중...','성공.'];
-  let p=0;
-  const iv=setInterval(()=>{
-    p=Math.min(p+2,100);bar.style.width=p+'%';
-    msg.textContent=msgs[Math.min(Math.floor(p/40),msgs.length-1)];
-    if(p>=100){clearInterval(iv);loadDone=true;document.getElementById('btn-s0-enter').style.display='block';}
-  },40);
-});
-document.getElementById('btn-s0-enter').addEventListener('click',()=>{tryLoadImg('img-scary','scary.jpg');initDash();goStage('s1');});
+// --- S0 로딩 ---
+document.getElementById('btn-s0-start').onclick = function(){
+  this.disabled = true;
+  let p = 0;
+  const iv = setInterval(()=>{
+    p += 2;
+    if(p>=100){
+      clearInterval(iv);
+      document.getElementById('btn-s0-enter').style.display='block';
+    }
+  }, 30);
+};
+document.getElementById('btn-s0-enter').onclick = ()=>{ 
+  S.audioUnlocked = true;
+  go('s1'); startDash(); 
+};
 
-function initDash(){
-  S.dist=100;S.maxDist=100;S.stamina=8;
-  clearInterval(S.dashTI);
-  document.getElementById('dist-num').textContent=100;
-  document.getElementById('dist-bar').style.width='100%';
-  document.getElementById('btn-run').style.display='block';
-  document.getElementById('btn-escape-room').style.display='none';
-  buildStamina();startDashTimer();
+// --- S1 달리기 (난이도 5배 업) ---
+let dashIv;
+function startDash(){
+  dashIv = setInterval(()=>{
+    S.dashTimer--;
+    document.getElementById('dash-timer').textContent = S.dashTimer;
+    if(S.dashTimer <= 0){
+      S.dist += 15; // 4초마다 15m씩 귀신이 다가옴
+      S.dashTimer = 4;
+      updateDash();
+    }
+  }, 1000);
 }
-function buildStamina(){
-  const w=document.getElementById('stamina-wrap');w.innerHTML='';
-  for(let i=0;i<8;i++){
-    const b=document.createElement('div');b.className='stamina-block alive';
-    b.id='sb'+i;w.appendChild(b);
+document.getElementById('btn-run').onclick = ()=>{
+  S.dist -= 4; // 클릭당 4m만 이동 (훨씬 많이 눌러야 함)
+  updateDash();
+};
+function updateDash(){
+  if(S.dist > 200) S.dist = 200;
+  document.getElementById('dist-num').textContent = S.dist;
+  document.getElementById('dist-bar').style.width = (S.dist/200*100)+'%';
+  if(S.dist <= 0){
+    clearInterval(dashIv);
+    document.getElementById('btn-run').style.display='none';
+    document.getElementById('btn-escape-room').style.display='block';
   }
 }
-document.getElementById('btn-escape-room').addEventListener('click',()=>{clearInterval(S.dashTI);initDoors();goStage('s2');});
+document.getElementById('btn-escape-room').onclick = ()=>{ initDoors(); go('s2'); };
 
-const CREATURES=['👾','💀','👁️'];
+// --- S2 문 선택 ---
 function initDoors(){
-  S.doorStreak=0;S.doorHP=5;
-  document.getElementById('streak-num').textContent=0;
-  document.getElementById('door-grid').style.display='grid';
-  document.getElementById('btn-door-next').style.display='none';
-  document.getElementById('door-dead-box').style.display='none';
-  for(let i=0;i<5;i++){const h=document.getElementById('hp'+i);if(h){h.className='hp-heart';h.textContent='❤️';}}
+  S.doorStreak = 0; S.doorHP = 3;
   buildDoors();
 }
 function buildDoors(){
-  const g=document.getElementById('door-grid');g.innerHTML='';
-  const safeIdx=Math.floor(Math.random()*5);
-  for(let i=0;i<5;i++){
-    const d=document.createElement('div');d.className='door-card';
-    d.innerHTML=`<div class="di">🚪</div><div>???</div>`;
-    d.dataset.safe=(i===safeIdx)?'1':'0';
-    d.addEventListener('click',()=>onDoorClick(d));
+  const g = document.getElementById('door-grid'); g.innerHTML='';
+  const win = Math.floor(Math.random()*5);
+  for(let i=0; i<5; i++){
+    const d = document.createElement('div'); d.className='door-card'; d.textContent='🚪';
+    d.onclick = ()=>{
+      if(i===win){
+        S.doorStreak++;
+        if(S.doorStreak>=4){ g.innerHTML=''; document.getElementById('btn-door-next').style.display='block'; }
+        else buildDoors();
+      } else {
+        S.doorHP--;
+        document.getElementById('door-hp-wrap').textContent = '목숨: ' + '❤️'.repeat(S.doorHP) + '🖤'.repeat(3-S.doorHP);
+        if(S.doorHP<=0){ g.innerHTML=''; document.getElementById('btn-retry-door').style.display='block'; }
+        else buildDoors();
+      }
+      document.getElementById('streak-num').textContent = S.doorStreak;
+    };
     g.appendChild(d);
   }
 }
-function onDoorClick(d){
-  if(d.dataset.used==='1')return;d.dataset.used='1';
-  if(d.dataset.safe==='1'){
-    d.classList.add('correct');S.doorStreak++;
-    document.getElementById('streak-num').textContent=S.doorStreak;
-    if(S.doorStreak>=2){setTimeout(()=>{document.getElementById('door-grid').style.display='none';document.getElementById('btn-door-next').style.display='block';},400);}
-    else{setTimeout(buildDoors,500);}
-  } else {
-    d.classList.add('wrong');S.doorHP--;
-    if(S.doorHP>=0){const h=document.getElementById('hp'+S.doorHP);if(h){h.classList.add('lost');h.textContent='🖤';}}
-    if(S.doorHP<=0){document.getElementById('door-grid').style.display='none';document.getElementById('door-dead-box').style.display='block';document.getElementById('btn-retry-door').style.display='block';}
-    else{setTimeout(buildDoors,500);}
-  }
-}
-document.getElementById('btn-retry-door').addEventListener('click',initDoors);
-document.getElementById('btn-door-next').addEventListener('click',()=>{initRoulette();goStage('s25');});
+document.getElementById('btn-retry-door').onclick = ()=>{ initDoors(); document.getElementById('btn-retry-door').style.display='none'; };
+document.getElementById('btn-door-next').onclick = ()=>{ initRoulette(); go('s25'); };
 
-const RC=document.getElementById('roulette-canvas');
-const RCX=RC.getContext('2d');
-function drawWheel(a){
-  const cx=130,cy=130,r=120,n=RSEGS.length,sl=(2*Math.PI)/n,off=a*Math.PI/180;
-  RCX.clearRect(0,0,260,260);
-  for(let i=0;i<n;i++){
-    const st=off+i*sl;
-    RCX.beginPath();RCX.moveTo(cx,cy);RCX.arc(cx,cy,r,st,st+sl);RCX.closePath();
-    RCX.fillStyle=(RSEGS[i]==='통과')?'#004400':'#440000';RCX.fill();
-    RCX.save();RCX.translate(cx,cy);RCX.rotate(st+sl/2);
-    RCX.fillStyle='#fff';RCX.font='bold 12px sans-serif';RCX.fillText(RSEGS[i],r*.7,0);RCX.restore();
-  }
-}
+// --- S2.5 룰렛 (8칸 중 단 1칸만 성공 - 난이도 5배 업) ---
+const RSEGS=['꽝','꽝','통과','꽝','꽝','꽝','꽝','꽝'];
 function initRoulette(){
-  S.rCombo=0;S.rSpinning=false;
-  document.getElementById('roulette-spin-btn').style.display='block';
-  document.getElementById('btn-to-trust').style.display='none';
-  drawWheel(0);
-}
-document.getElementById('roulette-spin-btn').addEventListener('click',function(){
-  if(S.rSpinning)return; S.rSpinning=true;
-  const stop=Math.floor(Math.random()*360);
-  const total=1800+stop;
-  const t0=performance.now();
-  (function anim(now){
-    const t=Math.min((now-t0)/2500,1);
-    const ease=t=>1-Math.pow(1-t,3);
-    const ang=(total*ease(t))%360;
-    drawWheel(ang);
-    if(t<1)requestAnimationFrame(anim);
-    else{
-      const needle=(360-ang%360+270)%360;
-      const idx=Math.floor(needle/(360/RSEGS.length))%RSEGS.length;
-      if(RSEGS[idx]==='통과'){
-        document.getElementById('roulette-spin-btn').style.display='none';
-        document.getElementById('btn-to-trust').style.display='block';
-        document.getElementById('roulette-status').className='sbox ok';
-        document.getElementById('roulette-status').textContent='🎉 통과 성공!';
-      } else { S.rSpinning=false; alert('꽝! 다시 돌려보세요.'); }
+  const canvas = document.getElementById('roulette-canvas');
+  const ctx = canvas.getContext('2d');
+  function draw(ang){
+    ctx.clearRect(0,0,260,260);
+    for(let i=0; i<8; i++){
+      ctx.beginPath(); ctx.moveTo(130,130);
+      ctx.arc(130,130,120, (ang+i*45)*Math.PI/180, (ang+(i+1)*45)*Math.PI/180);
+      ctx.fillStyle = RSEGS[i]==='통과'?'#00ff00':'#440000'; ctx.fill();
     }
-  })(performance.now());
-});
-
-document.getElementById('btn-to-trust').addEventListener('click',()=>{initTrust();goStage('s3');});
-const TPHRASES=['믿어','행복하자','사랑해'];
-function initTrust(){
-  S.trustDone=0; S.trustIdx=0;
-  showTrustPhrase();
-}
-function showTrustPhrase(){
-  document.getElementById('trust-phrase').textContent='→ "'+TPHRASES[S.trustIdx]+'"';
-  document.getElementById('trust-input').value='';
-}
-document.getElementById('trust-input').addEventListener('input',function(){
-  if(this.value===TPHRASES[S.trustIdx]){
-    document.getElementById('td'+S.trustDone).classList.add('done');
-    S.trustDone++; S.trustIdx++;
-    if(S.trustDone>=3){launchBalloons();tryLoadImg('img-cute','cute.jpg');goStage('s4');}
-    else{showTrustPhrase();}
   }
-});
-
-document.getElementById('btn-to-heart').addEventListener('click',()=>{initHearts();goStage('s5');});
-function initHearts(){
-  S.heartCount=0;
-  document.getElementById('heart-num').textContent='0 / 6';
-  buildHeartGrid();
-}
-function buildHeartGrid(){
-  const g=document.getElementById('heart-grid'); g.innerHTML='';
-  for(let i=0;i<16;i++){
-    const c=document.createElement('div'); c.className='heart-cell';
-    c.textContent=(Math.random()>0.5)?'💖':'🤍';
-    c.addEventListener('click',function(){
-      if(this.textContent==='💖'){
-        S.heartCount++; document.getElementById('heart-num').textContent=S.heartCount+' / 6';
-        if(S.heartCount>=6){document.getElementById('btn-to-thread').style.display='block';}
-        else{buildHeartGrid();}
+  draw(0);
+  document.getElementById('roulette-spin-btn').onclick = function(){
+    this.disabled = true;
+    let a = 0, speed = 20 + Math.random()*20;
+    const iv = setInterval(()=>{
+      a += speed; speed *= 0.98;
+      draw(a);
+      if(speed < 0.1){
+        clearInterval(iv);
+        this.disabled = false;
+        const final = (360 - (a % 360) + 270) % 360;
+        const idx = Math.floor(final / 45) % 8;
+        document.getElementById('spin-result-ring').textContent = RSEGS[idx];
+        if(RSEGS[idx]==='통과'){
+          document.getElementById('btn-to-trust').style.display='block';
+          this.style.display='none';
+        }
       }
-    });
-    g.appendChild(c);
+    }, 20);
+  };
+}
+document.getElementById('btn-to-trust').onclick = ()=>{ go('s3'); initTrust(); };
+
+// --- S3 믿음 타이핑 ---
+function initTrust(){
+  const ts = ["소연아 사랑해", "우리는 영원히", "함께할거야"];
+  let idx = 0;
+  document.getElementById('trust-phrase').textContent = ts[idx];
+  document.getElementById('trust-input').oninput = function(){
+    if(this.value === ts[idx]){
+      idx++;
+      if(idx >= 3) go('s4');
+      else { this.value=''; document.getElementById('trust-phrase').textContent = ts[idx]; }
+    }
+  };
+}
+
+// --- S5 하트 (18개 수집 & 감점 - 난이도 3배 업) ---
+document.getElementById('btn-to-heart').onclick = ()=>{ go('s5'); buildHearts(); };
+function buildHearts(){
+  const g = document.getElementById('heart-grid'); g.innerHTML='';
+  for(let i=0; i<16; i++){
+    const h = document.createElement('div'); h.className='heart-cell';
+    h.textContent = Math.random()>0.7?'💖':'🤍';
+    h.onclick = ()=>{
+      if(h.textContent==='💖'){ S.heart++; }
+      else { S.heart = Math.max(0, S.heart - 1); flash(); }
+      document.getElementById('heart-num').textContent = S.heart;
+      if(S.heart>=18) document.getElementById('btn-to-thread').style.display='block';
+      else buildHearts();
+    };
+    g.appendChild(h);
   }
 }
-document.getElementById('btn-to-thread').addEventListener('click',()=>{initThread();goStage('s6');});
-
-function initThread(){
-  S.threadTries=15; S.threadFound=false;
-  document.getElementById('thread-tries').textContent=15;
-  buildThreadArena();
+function flash(){ 
+  const f=document.getElementById('flash'); f.style.opacity='0.5'; 
+  setTimeout(()=>f.style.opacity='0', 100); 
 }
-function buildThreadArena(){
-  const arena=document.getElementById('thread-arena'); arena.innerHTML='';
-  const realIdx=Math.floor(Math.random()*12);
-  for(let i=0;i<12;i++){
-    const el=document.createElement('div'); el.className='thread-item';
-    el.textContent=(i===realIdx)?'🧵':'🧶';
-    el.style.left=Math.random()*80+'%'; el.style.top=Math.random()*80+'%';
-    el.addEventListener('click',function(){
-      if(i===realIdx){document.getElementById('btn-thread-next').style.display='block';}
-      else{S.threadTries--; document.getElementById('thread-tries').textContent=S.threadTries;}
-    });
-    arena.appendChild(el);
+
+// --- S6 운명의 실 (신중한 선택 - 난이도 업) ---
+document.getElementById('btn-to-thread').onclick = ()=>{ go('s6'); buildThreads(); };
+function buildThreads(){
+  S.threadTries = 3;
+  document.getElementById('thread-tries').textContent = S.threadTries;
+  const arena = document.getElementById('thread-arena'); arena.innerHTML='';
+  const win = Math.floor(Math.random()*20); // 20개의 실 중 하나
+  for(let i=0; i<20; i++){
+    const t = document.createElement('div'); t.className='thread-item';
+    t.textContent = '🧵';
+    t.style.left = Math.random()*85+'%'; t.style.top = Math.random()*85+'%';
+    t.onclick = ()=>{
+      if(i===win){
+        t.style.color = 'red'; t.style.fontSize = '3rem';
+        document.getElementById('btn-thread-next').style.display='block';
+      } else {
+        S.threadTries--;
+        document.getElementById('thread-tries').textContent = S.threadTries;
+        t.style.display='none';
+        if(S.threadTries<=0){ 
+          arena.innerHTML=''; 
+          document.getElementById('btn-thread-retry').style.display='block'; 
+        }
+      }
+    };
+    arena.appendChild(t);
   }
 }
-document.getElementById('btn-thread-next').addEventListener('click',()=>{initProposal();goStage('s7');});
+document.getElementById('btn-thread-retry').onclick = function(){
+  this.style.display='none'; buildThreads();
+};
 
-function initProposal(){
-  S.noEscapes=0;
-  document.getElementById('no-btn').style.top='50%';
+// --- S7 고백 (NO 도망가기) ---
+document.getElementById('btn-thread-next').onclick = ()=>go('s7');
+document.getElementById('no-btn').onmouseenter = function(){
+  this.style.left = Math.random()*60+'%';
+  this.style.top = Math.random()*60+'%';
+};
+document.getElementById('yes-btn').onclick = ()=>{ launchBalloons(); go('s8'); };
+
+function launchBalloons(){
+  for(let i=0; i<30; i++){
+    const b = document.createElement('div'); b.className='balloon';
+    b.textContent = ['🎈','💖','🌹'][Math.floor(Math.random()*3)];
+    b.style.left = Math.random()*100+'vw';
+    b.style.animationDuration = (2+Math.random()*3)+'s';
+    document.getElementById('balloon-wrap').appendChild(b);
+  }
 }
-document.getElementById('no-btn').addEventListener('mouseenter',function(){
-  this.style.left=Math.random()*70+'%'; this.style.top=Math.random()*70+'%';
-});
-document.getElementById('yes-btn').addEventListener('click',()=>{launchBalloons();tryLoadImg('img-final','final.jpg');goStage('s8');});
-document.getElementById('btn-restart').addEventListener('click',()=>location.reload());
+document.getElementById('btn-restart').onclick = ()=>location.reload();
 </script>
 </body>
 </html>
