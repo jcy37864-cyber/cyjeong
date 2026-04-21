@@ -3,152 +3,214 @@ import random
 import os
 import base64
 
-# ================= 1. 기본 설정 및 상태 관리 =================
+# ================= 1. 페이지 기본 설정 =================
 st.set_page_config(page_title="???", page_icon="👁️", layout="centered")
 
+# 세션 상태 초기화 (데이터 보존)
 if "stage" not in st.session_state:
     st.session_state.update({
         "stage": 0,
-        "bgm_started": False,
         "bgm_type": "scary",
         "survive": 0,
         "fail": 0,
         "heart": 0,
         "safe_choice": random.randint(0, 2),
-        "heart_choice": random.randint(0, 2)
+        "heart_choice": random.randint(0, 2),
+        "flicker": False  # 전환 효과용
     })
 
-# ================= 2. 🎨 스테이지별 동적 스타일 (배경색 변경 핵심) =================
-def apply_style():
-    # 4단계(반전)부터는 하얀 배경, 그 전에는 검정 배경
+# ================= 2. 유틸리티 함수 (이미지, 오디오) =================
+
+def get_base64(file_path):
+    """파일을 base64로 변환하여 브라우저에서 직접 재생/표시 가능하게 함"""
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as f:
+            data = f.read()
+        return base64.b64encode(data).decode()
+    return None
+
+def play_audio(file_name):
+    """오디오 자동 재생 (브라우저 정책상 첫 클릭 이후 작동)"""
+    b64 = get_base64(file_name)
+    if b64:
+        st.markdown(f"""
+            <audio autoplay loop>
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+            """, unsafe_allow_html=True)
+
+# ================= 3. 🎨 동적 스타일링 (아이디어 추가) =================
+def apply_custom_style():
+    # 스테이지에 따른 테마 색상 설정
     if st.session_state.stage >= 4:
-        bg_color = "white"
-        text_color = "black"
-        btn_border = "pink"
-        btn_text = "red"
+        bg_color, text_color, accent = "#FFFFFF", "#333333", "#FF4B4B"
+        font_family = "'Nanum Pen Script', cursive"
     else:
-        bg_color = "black"
-        text_color = "white"
-        btn_border = "red"
-        btn_text = "red"
+        bg_color, text_color, accent = "#0E1117", "#FF0000", "#8B0000"
+        font_family = "serif"
 
     st.markdown(f"""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+    
     .stApp {{
         background-color: {bg_color};
         color: {text_color};
-        transition: background-color 2s; /* 배경 바뀔 때 부드럽게 */
+        transition: all 1.5s ease-in-out;
     }}
+    
+    /* 공포 분위기 글리치 효과 */
+    .glitch {{
+        font-size: 40px;
+        font-weight: bold;
+        text-transform: uppercase;
+        position: relative;
+        text-shadow: 0.05em 0 0 rgba(255,0,0,.75), -0.025em -0.05em 0 rgba(0,255,0,.75), 0.025em 0.05em 0 rgba(0,0,255,.75);
+        animation: glitch 500ms infinite;
+    }}
+    
+    @keyframes glitch {{
+        0% {{ text-shadow: 1px 0 0 red, -1px 0 0 blue; }}
+        50% {{ text-shadow: -1px 0 0 red, 1px 0 0 blue; }}
+        100% {{ text-shadow: 1px 0 0 red, -1px 0 0 blue; }}
+    }}
+
+    /* 버튼 스타일 */
     button {{
         background-color: {bg_color} !important;
-        color: {btn_text} !important;
-        border: 2px solid {btn_border} !important;
+        color: {accent} !important;
+        border: 1px solid {accent} !important;
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
+        width: 100%;
     }}
-    .center {{text-align:center;}}
-    .big {{font-size:40px; font-weight:bold;}}
-    .scary {{color:red; font-size:30px;}}
-    .cute {{color:#ff4b4b; font-size:30px;}}
+    
+    .center {{ text-align: center; font-family: {font_family}; }}
     </style>
     """, unsafe_allow_html=True)
 
-apply_style()
+apply_custom_style()
 
-# ================= 3. 🎧 음악 및 이미지 함수 =================
-def play_audio(file_name):
-    if os.path.exists(file_name):
-        with open(file_name, "rb") as f:
-            data = f.read()
-            b64 = base64.b64encode(data).decode()
-            st.markdown(f'<audio src="data:audio/mp3;base64,{b64}" autoplay loop></audio>', unsafe_allow_html=True)
+# ================= 4. 게임 스테이지 로직 =================
 
-def show_image(file_name):
-    if os.path.exists(file_name):
-        st.image(file_name, use_container_width=True)
-    else:
-        st.error(f"⚠️ {file_name} 파일을 찾을 수 없습니다. GitHub에 올렸는지 확인해주세요!")
-
-# ================= 4. 게임 로직 =================
-
-# --- 스테이지 0: 시작 ---
+# --- STAGE 0: 시작 ---
 if st.session_state.stage == 0:
-    st.markdown('<div class="center big">⚠️ 들어오면 안됐어</div>', unsafe_allow_html=True)
-    if st.button("시작"):
+    st.markdown('<div class="center glitch">⚠️ WARNING ⚠️</div>', unsafe_allow_html=True)
+    st.markdown('<p class="center">이 페이지는 위험한 내용을 포함할 수 있습니다.</p>', unsafe_allow_html=True)
+    if st.button("진입하기"):
         st.session_state.stage = 1
-        st.session_state.bgm_started = True
         st.rerun()
 
-# --- 스테이지 1: 공포 ---
+# --- STAGE 1: 분위기 고조 ---
 elif st.session_state.stage == 1:
     play_audio("bgm_scary.mp3")
-    st.markdown('<div class="center scary">누가 보고 있어</div>', unsafe_allow_html=True)
-    show_image("scary1.jpg")
+    st.markdown('<div class="center glitch">누가 보고 있어...</div>', unsafe_allow_html=True)
+    
+    img_b64 = get_base64("scary1.jpg")
+    if img_b64:
+        st.markdown(f'<div class="center"><img src="data:image/jpeg;base64,{img_b64}" width="100%"></div>', unsafe_allow_html=True)
+    else:
+        st.info("(공포스러운 그림자가 드리웁니다...)") # 파일 없을 때 대비
+
     if st.button("계속"):
         st.session_state.stage = 2
         st.rerun()
 
-# --- 스테이지 2: 생존 ---
+# --- STAGE 2: 생존 선택 ---
 elif st.session_state.stage == 2:
     play_audio("bgm_scary.mp3")
-    st.markdown(f'<div class="center big">살고 싶어? ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="center" style="font-size:30px;">살고 싶어? ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
+    
     cols = st.columns(3)
     for i in range(3):
         with cols[i]:
-            if st.button(f"문 {i+1}", key=f"s{i}"):
+            if st.button(f"???", key=f"btn_{i}"):
                 if i == st.session_state.safe_choice:
                     st.session_state.survive += 1
-                    st.toast("살았다...")
+                    st.toast("...운이 좋군")
                 else:
                     st.session_state.fail += 1
-                    st.toast("틀렸어 🔪")
+                    st.toast("틀렸어.")
                 st.session_state.safe_choice = random.randint(0, 2)
                 st.rerun()
 
     if st.session_state.fail >= 3:
-        st.error("나가는 게 쉽진 않지...")
-        if st.button("다시 시도"):
-            st.session_state.update({"stage": 0, "fail": 0, "survive": 0})
+        st.error("영원히 나갈 수 없습니다.")
+        if st.button("다시 시도... 하시겠습니까?"):
+            st.session_state.update({"stage":0, "fail":0, "survive":0})
             st.rerun()
+
     if st.session_state.survive >= 3:
-        if st.button("도망치기"):
+        if st.button("빛이 보이는 곳으로"):
             st.session_state.stage = 3
             st.rerun()
 
-# --- 스테이지 3: 질문 ---
+# --- STAGE 3: 최종 관문 ---
 elif st.session_state.stage == 3:
     play_audio("bgm_scary.mp3")
-    st.markdown('<div class="center scary">정말 나를 믿어?</div>', unsafe_allow_html=True)
-    if st.button("믿는다"):
-        st.session_state.stage = 4
-        st.rerun()
-    if st.button("안 믿는다"):
-        st.markdown('<div class="center big">💥 BOOM 💥</div>', unsafe_allow_html=True)
+    st.markdown('<div class="center glitch">마지막으로 묻지... 나를 믿어?</div>', unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("믿는다"):
+            st.session_state.stage = 4
+            st.rerun()
+    with col2:
+        if st.button("믿지 않는다"):
+            st.markdown('<div class="center" style="color:red; font-size:50px;">GAME OVER</div>', unsafe_allow_html=True)
 
-# --- 스테이지 4: 반전 (여기서 배경이 하얗게 변함) ---
+# --- STAGE 4: 반전 (흰색 배경 전환) ---
 elif st.session_state.stage == 4:
     st.balloons()
-    st.markdown('<div class="center cute">ㅋㅋ 놀랐지? 무서운 거 아니야!</div>', unsafe_allow_html=True)
-    if st.button("...사실은"):
-        st.session_state.bgm_type = "love"
+    st.markdown('<div class="center" style="font-size:40px; color:#FF4B4B; font-family:\'Nanum Pen Script\';">짜잔! 놀랐지? 무서운 거 아니야! 🎁</div>', unsafe_allow_html=True)
+    st.markdown('<p class="center" style="color:gray;">사실 널 위해 준비한 작은 서프라이즈야.</p>', unsafe_allow_html=True)
+    if st.button("사실은..."):
         st.session_state.stage = 5
         st.rerun()
 
-# --- 스테이지 5: 하트 모으기 ---
+# --- STAGE 5: 하트 게임 (밝은 분위기) ---
 elif st.session_state.stage == 5:
     play_audio("bgm_love.mp3")
-    st.markdown(f'<div class="center cute">하트 5개를 모아줘 💖 ({st.session_state.heart}/5)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="center" style="font-size:35px; color:#FF4B4B;">내 마음을 받아줘! 💖 ({st.session_state.heart}/5)</div>', unsafe_allow_html=True)
+    
     cols = st.columns(3)
     for i in range(3):
         with cols[i]:
             if i == st.session_state.heart_choice:
-                if st.button("💖", key=f"h{i}"):
+                if st.button("💖", key=f"heart_{i}"):
                     st.session_state.heart += 1
                     st.session_state.heart_choice = random.randint(0, 2)
                     st.rerun()
             else:
-                if st.button("🖤", key=f"b{i}"):
-                    st.toast("꽝!")
+                if st.button("🤍", key=f"empty_{i}"):
+                    st.toast("다시 찾아봐!")
                     st.session_state.heart_choice = random.randint(0, 2)
                     st.rerun()
 
     if st.session_state.heart >= 5:
-        if st.button("다음으로"):
+        if st.button("확인하러 가기"):
+            st.session_state.stage = 6
+            st.rerun()
+
+# --- STAGE 6: 최종 메시지 ---
+elif st.session_state.stage == 6:
+    play_audio("bgm_love.mp3")
+    st.markdown('<div class="center" style="font-size:40px;">나랑 계속...</div>', unsafe_allow_html=True)
+    if st.button("함께해줄래?"):
+        st.session_state.stage = 7
+        st.rerun()
+
+# --- STAGE 7: 결말 (QR 코드) ---
+elif st.session_state.stage == 7:
+    play_audio("bgm_love.mp3")
+    st.markdown('<div class="center" style="font-size:45px; color:#FF4B4B;">YES! 💖✨</div>', unsafe_allow_html=True)
+    st.balloons()
+    
+    qr_b64 = get_base64("qr.png")
+    if qr_b64:
+        st.markdown(f'<div class="center"><img src="data:image/png;base64,{qr_b64}" width="250px"></div>', unsafe_allow_html=True)
+    else:
+        st.success("너를 위한 선물이 준비되어 있어! (qr.png 파일을 확인해줘)")
+        
+    if st.button("처음으로 돌아가기"):
+        st.session_state.clear()
+        st.rerun()
