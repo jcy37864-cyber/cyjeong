@@ -7,7 +7,7 @@ import time
 # ================= 1. 페이지 설정 =================
 st.set_page_config(page_title="scare", page_icon="🎨", layout="centered")
 
-# [세션 상태 안전 초기화] - 하나하나 체크해서 에러 방지
+# [세션 상태 안전 초기화]
 if "stage" not in st.session_state: st.session_state.stage = 0
 if "survive" not in st.session_state: st.session_state.survive = 0
 if "fail" not in st.session_state: st.session_state.fail = 0
@@ -23,7 +23,6 @@ if "current_track" not in st.session_state: st.session_state.current_track = ""
 
 # ================= 2. 🎨 디자인 테마 =================
 def apply_theme():
-    # 스테이지 4부터는 화사한 화이트, 그 전엔 공포의 블랙
     is_love = st.session_state.stage >= 4
     bg = "#FFFFFF" if is_love else "#000000"
     txt = "#333333" if is_love else "#FF0000"
@@ -53,9 +52,8 @@ def apply_theme():
 
 apply_theme()
 
-# ================= 3. 🎵 기능 함수 (오류 방지형) =================
+# ================= 3. 🎵 기능 함수 =================
 def play_audio(file_name):
-    # 세션 상태에서 안전하게 가져오기
     current = st.session_state.get("current_track", "")
     if current == file_name:
         return
@@ -104,7 +102,7 @@ if st.session_state.stage == 0:
             st.session_state.stage = 1
             st.rerun()
 
-# [Stage 1] 도망쳐! (강화 연출)
+# [Stage 1] 도망쳐!
 elif st.session_state.stage == 1:
     play_audio("bgm_scary.mp3")
     st.markdown('<div class="center shake-text">소연아 도망쳐!!!</div>', unsafe_allow_html=True)
@@ -122,7 +120,7 @@ elif st.session_state.stage == 1:
             st.session_state.stage = 2
             st.rerun()
 
-# [Stage 2] 문 선택 (3회)
+# [Stage 2] 문 선택
 elif st.session_state.stage == 2:
     play_audio("bgm_scary.mp3")
     st.markdown(f'<div class="center" style="font-size:30px;">문 선택 ({st.session_state.survive}/3)</div>', unsafe_allow_html=True)
@@ -141,12 +139,15 @@ elif st.session_state.stage == 2:
     if st.session_state.fail >= 3:
         show_img("jumpscare.jpg")
         if st.button("다시 도전"):
-            st.session_state.survive = 0; st.session_state.fail = 0; st.rerun()
+            st.session_state.survive = 0
+            st.session_state.fail = 0
+            st.rerun()
     if st.session_state.survive >= 3:
         if st.button("탈출구 발견!"):
-            st.session_state.stage = 2.5; st.rerun()
+            st.session_state.stage = 2.5
+            st.rerun()
 
-# [Stage 2.5] 공포의 룰렛 (2회 성공)
+# [Stage 2.5] 공포의 룰렛
 elif st.session_state.stage == 2.5:
     play_audio("bgm_scary.mp3")
     st.markdown('<div class="center" style="font-size:30px; color:red;">💀 공포의 룰렛 💀</div>', unsafe_allow_html=True)
@@ -166,49 +167,4 @@ elif st.session_state.stage == 2.5:
             st.rerun()
     else:
         if st.button("빛이 보이는 곳으로"):
-            st.session_state.stage = 3; st.rerun()
-
-# [Stage 3] 믿음 테스트
-elif st.session_state.stage == 3:
-    play_audio("bgm_scary.mp3")
-    show_img("scary.jpg")
-    msgs = ["소연아, 나 믿어?", "진짜 믿어?", "내 손 잡을 거지?"]
-    btns = ["믿는다", "진짜!", "당연하지!"]
-    idx = min(st.session_state.trust_count, 2)
-    typewriter(msgs[idx])
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button(btns[idx]):
-            st.session_state.trust_count += 1
-            if st.session_state.trust_count >= 3: st.session_state.stage = 4
-            st.rerun()
-    with col2:
-        if st.button("의심스러워"):
-            st.error("어둠 속에 고립되었습니다.")
-            if st.button("다시 시도"): st.session_state.trust_count = 0; st.rerun()
-
-# [Stage 4] 반전 고백
-elif st.session_state.stage == 4:
-    play_audio("bgm_love.mp3")
-    st.balloons()
-    st.markdown('<div class="center" style="font-size:35px; color:#FF4B4B; font-weight:bold;">🎉 소연아! 놀랐지? 🎉</div>', unsafe_allow_html=True)
-    show_img("cute.jpg")
-    typewriter("전부 널 위해 준비한 이벤트야! 놀라게 해서 미안해.")
-    if st.button("내 진심 확인하기"):
-        st.session_state.stage = 5; st.rerun()
-
-# [Stage 5] 하트 잡기 (10개)
-elif st.session_state.stage == 5:
-    play_audio("bgm_love.mp3")
-    st.markdown(f'<div class="center" style="font-size:30px; color:#FF4B4B;">마음을 잡아줘 💖 ({st.session_state.heart}/10)</div>', unsafe_allow_html=True)
-    st.progress(st.session_state.heart / 10)
-    cols = st.columns(3)
-    for i in range(3):
-        with cols[i]:
-            if i == st.session_state.heart_choice:
-                if st.button("💖", key=f"h_{i}"):
-                    st.session_state.heart += 1
-                    st.session_state.heart_choice = random.randint(0, 2)
-                    st.rerun()
-            else
+            st.session_state.stage
