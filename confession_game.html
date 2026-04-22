@@ -17,8 +17,15 @@ body{font-family:var(--font-body);background:var(--h-bg);color:var(--h-text);
   min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
   transition:background 1.2s ease,color 1.2s ease;overflow-x:hidden;}
 body.love-mode{background:var(--l-bg);color:var(--l-text);}
-#game{width:100%;max-width:380px;padding:.0.2rem 1.1rem 3rem;min-height:100vh;
-  display:flex;flex-direction:column;gap:.9rem;}
+#game {
+  width: 100%;
+  max-width: 360px; /* 아까 정한 슬림한 폭 */
+  margin: 0 auto;   /* 중요: 좌우 여백을 똑같이 나눠서 중앙에 배치 */
+  position: relative; 
+  left: 0;          /* 혹시 left 값이 들어가 있다면 0으로 초기화 */
+  padding: 1rem;
+  overflow-x: hidden; /* 혹시라도 내용물이 삐져나와서 화면이 밀리는 걸 방지 */
+}
 
 /* stages */
 .stage{display:none;flex-direction:column;gap:1.1rem;animation:fadeIn .5s ease;}
