@@ -300,9 +300,7 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
   <div class="title-love">🎉 축복, 새로운 시작! 🎉</div>
   <div class="img-box love-frame" id="img-final"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">💑</div><div>final.jpg</div></div></div>
   <div class="ending-text">이 모든 공포를 뚫고도<br>여기까지 왔어. 수고했어, 소연아 💖</div>
-  <div class="sbox love">
-  <div id="final-text"></div>
-  <button class="btn btn-love" onclick="nextFinal()">다음</button>
+  <div class="sbox love">평생 나랑 놀자!🌹좋지?(대답:)💖 </div>
   <button class="btn btn-love" id="btn-restart">처음으로 돌아가기</button>
 </div>
 
@@ -835,34 +833,6 @@ document.getElementById('btn-restart').addEventListener('click',()=>{
 
 /* INIT */
 drawWheel(0);
-<script>
-const finalLines = [
-  "처음에는 그냥",
-  "평범한 사람이었어",
-  "근데 어느 순간부터",
-  "너랑 대화하는 순간들이",
-  "제일 좋고 편해졌어",
-  "그래서 말하고 싶어",
-  "나는",
-  "너를 좋아해",
-  "앞으로도",
-  "지금처럼",
-  "같이 함께 웃고 싶어"
-];
-
-let finalIndex = 0;
-
-function nextFinal(){
-  const el = document.getElementById("final-text");
-  if(!el) return;  // ⭐ 이거 없으면 죽음
-
-  if(finalIndex < finalLines.length){
-    el.innerHTML += finalLines[finalIndex] + "<br>";
-    finalIndex++;
-  } else {
-    el.innerHTML += "<br>나랑 계속 같이 있을래?";
-  }
-}
 </script>
 </body>
 </html>
