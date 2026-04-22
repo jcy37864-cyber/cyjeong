@@ -198,24 +198,24 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 
 <!-- S1: 달리기 -->
 <div class="stage" id="s1">
-  <div class="shake" id="shake-text">🔪 소연아!! 뒤를 봐!! 🔪</div>
+  <div class="shake" id="shake-text">🔪 소연아!! 저기 뒤를 봐!! 🔪</div>
   <div class="img-box" id="img-scary"><div class="img-ph"><div class="ic">👁️</div><div>scary.jpg</div></div></div>
   <div class="dist-big">🏃 <span id="dist-num">300</span>m</div>
   <div id="dist-delta">&nbsp;</div>
   <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
   <div id="dash-timer-wrap" style="display:none">
     <div class="countdown-ring" id="dash-timer">4</div>
-    <div id="dash-timer-label">이 안에 클릭 안 하면 거리 증가!!</div>
+    <div id="dash-timer-label">이 안을 클릭 안 하면 거리 증가!!</div>
   </div>
   <div id="stamina-wrap"></div>
-  <button class="btn btn-horror" id="btn-run" style="font-size:1.5rem;padding:1.2rem">🏃 달려!! 달려!! (클릭!)</button>
+  <button class="btn btn-horror" id="btn-run" style="font-size:1.5rem;padding:1.2rem">🏃🏃 달려!! 달려!! (클릭!)</button>
   <button class="btn btn-horror" id="btn-escape-room" style="display:none">🚪 탈출구로 질주!!</button>
 </div>
 
 <!-- S2: 그림자 문 -->
 <div class="stage" id="s2">
   <div class="title-horror" style="font-size:1.45rem">🚪 그림자 뒤의 진실</div>
-  <div class="shadow-creature" id="shadow-creature">👾</div>
+  <div class="shadow-creature" id="shadow-creature">👾👾👾</div>
   <div id="door-streak-box">연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">2</span>연속</div>
   <div id="door-hp-wrap">
     <span class="hp-heart" id="hp0">❤️</span>
@@ -224,14 +224,14 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
   </div>
   <div class="door-grid" id="door-grid"></div>
   <div class="sbox bad" id="door-dead-box" style="display:none">💀 그림자에게 삼켜졌다...</div>
-  <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 다시 일어서</button>
+  <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 다시 일어서!</button>
   <button class="btn btn-horror" id="btn-door-next" style="display:none">🔦 탈출구로!!</button>
 </div>
 
 <!-- S2.5: 룰렛 -->
 <div class="stage" id="s25">
   <div class="shake" style="font-size:1.8rem">💀 죽음의 룰렛 💀</div>
-  <div class="subtitle">2연속 통과해야 탈출!</div>
+  <div class="subtitle">2연속으로 통과해야 탈출!</div>
   <div id="roulette-canvas-wrap">
     <canvas id="roulette-canvas" width="260" height="260"></canvas>
     <div id="roulette-needle"></div>
@@ -240,13 +240,13 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
   <div id="roulette-status" class="sbox" style="display:none"></div>
   <div style="text-align:center;font-size:1rem;color:#ff6644;font-weight:700">연속 통과: <span id="combo-num">0</span> / 2</div>
   <button class="btn btn-horror" id="roulette-spin-btn">🎰 룰렛을 돌려라!</button>
-  <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 틈으로 기어나가기</button>
+  <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 틈으로 슬슬 기어 나가기</button>
 </div>
 
 <!-- S3: 믿음 타이핑 -->
 <div class="stage" id="s3">
   <div class="title-horror" style="font-size:1.35rem">소연아, 날 진짜 믿는다면...</div>
-  <div class="subtitle" style="color:#553333">아래 문장을 정확히 입력해봐</div>
+  <div class="subtitle" style="color:#553333">아래 글자를 정확히 입력해봐.</div>
   <div id="trust-phrase"></div>
   <input id="trust-input" type="text" autocomplete="off" spellcheck="false" placeholder="여기에 입력...">
   <div id="trust-progress-wrap">
@@ -262,7 +262,7 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 <div class="stage" id="s4">
   <div class="title-love">🌹 서프라이즈! 소연아! 🌹</div>
   <div class="img-box love-frame" id="img-cute"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">🌸</div><div>cute.jpg</div></div></div>
-  <button class="btn btn-love" id="btn-to-heart">💖 나의 진심을 확인할래?</button>
+  <button class="btn btn-love" id="btn-to-heart">💖 나의 진심을 확인해 볼래?</button>
 </div>
 
 <!-- S5: 하트 그리드 -->
@@ -299,8 +299,8 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 <div class="stage" id="s8">
   <div class="title-love">🎉 축복, 새로운 시작! 🎉</div>
   <div class="img-box love-frame" id="img-final"><div class="img-ph" style="background:#fff5f7;color:#ffaacc"><div class="ic">💑</div><div>final.jpg</div></div></div>
-  <div class="ending-text">이 모든 공포를 뚫고도<br>여기까지 왔어. 수고했어, 소연아 💖</div>
-  <div class="sbox love">평생 나랑 놀자!🌹좋지?(대답:)💖 </div>
+  <div class="ending-text">조금 특별하게<br>전하고 싶었, 소연아 💖</div>
+  <div class="sbox love"> ずっと一緒にいてくれる？I LOVE YOU.💑🌹 </div>
   <button class="btn btn-love" id="btn-restart">처음으로 돌아가기</button>
 </div>
 
