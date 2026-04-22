@@ -1,1 +1,1216 @@
-....
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>💀 SCARE — 소연에게</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --h-bg:#080808;--h-text:#ff2222;--h-dim:#991111;
+  --l-bg:#0a0015;--l-text:#e8b4d0;--l-accent:#ff6eb4;--l-star:#ffe066;
+  --font-main:'Black Han Sans',sans-serif;--font-body:'Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;min-height:100vh;}
+body{font-family:var(--font-body);background:var(--h-bg);color:var(--h-text);
+  min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+  transition:background 1.2s ease,color 1.2s ease;overflow-x:hidden;}
+body.love-mode{background:var(--l-bg);color:var(--l-text);}
+#game{width:100%;max-width:400px;padding:.6rem 1.1rem 3rem;min-height:100vh;
+  display:flex;flex-direction:column;gap:.9rem;}
+
+/* stages */
+.stage{display:none;flex-direction:column;gap:1.1rem;animation:fadeIn .5s ease;}
+.stage.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* typography */
+.title-horror{font-family:var(--font-main);font-size:clamp(1.7rem,7vw,2.6rem);
+  color:var(--h-text);text-align:center;letter-spacing:.05em;
+  text-shadow:0 0 30px rgba(255,34,34,.6);animation:flicker 3s infinite;}
+.title-love{font-family:var(--font-main);font-size:clamp(1.4rem,6vw,2.2rem);
+  color:var(--l-accent);text-align:center;letter-spacing:.03em;
+  text-shadow:0 0 20px rgba(255,110,180,.4);}
+.subtitle{font-size:.95rem;text-align:center;opacity:.82;line-height:1.75;}
+.narration{font-size:.88rem;color:#886655;text-align:center;font-style:italic;line-height:1.7;padding:0 .5rem;}
+body.love-mode .narration{color:#a07888;}
+
+/* buttons */
+.btn{width:100%;padding:.9rem 1.2rem;font-family:var(--font-main);
+  font-size:1.05rem;letter-spacing:.04em;border-radius:10px;cursor:pointer;
+  transition:all .16s ease;border:none;}
+.btn-horror{background:#0f0f0f;color:var(--h-text);border:2px solid var(--h-dim);}
+.btn-horror:hover{background:#1a0000;border-color:var(--h-text);transform:scale(1.02);box-shadow:0 0 18px rgba(255,34,34,.3);}
+.btn-horror:active{transform:scale(.97);}
+.btn-horror:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+.btn-love{background:rgba(255,110,180,.1);color:var(--l-accent);border:2px solid rgba(255,110,180,.5);}
+.btn-love:hover{background:rgba(255,110,180,.18);transform:scale(1.02);box-shadow:0 4px 18px rgba(255,110,180,.2);}
+.btn-love:active{transform:scale(.97);}
+
+/* progress */
+.prog-wrap{background:#1a0000;border-radius:99px;height:12px;overflow:hidden;border:1px solid #330000;}
+.prog-bar{height:100%;background:linear-gradient(90deg,#ff0000,#ff6644);border-radius:99px;transition:width .35s ease;}
+.prog-wrap.love{background:rgba(255,110,180,.1);border-color:rgba(255,110,180,.3);}
+.prog-wrap.love .prog-bar{background:linear-gradient(90deg,#ff6eb4,#ffb3d9);}
+
+/* status boxes */
+.sbox{border:2px solid var(--h-dim);background:#0a0000;border-radius:10px;
+  padding:.9rem 1.1rem;font-size:.95rem;font-weight:700;text-align:center;line-height:1.6;transition:all .3s;}
+.sbox.ok{border-color:#22dd22;color:#22dd22;}
+.sbox.bad{border-color:#ff4444;color:#ff4444;}
+.sbox.love{border-color:rgba(255,110,180,.6);background:rgba(255,110,180,.07);color:var(--l-accent);}
+
+/* images */
+.img-box{width:100%;border-radius:12px;overflow:hidden;border:3px solid #220000;background:#111;}
+.img-box img{width:100%;display:block;object-fit:cover;max-height:150px;}
+.img-ph{width:100%;height:140px;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.4rem;color:#444;font-size:.82rem;text-align:center;}
+.img-ph .ic{font-size:2rem;}
+.img-box.love-frame{border-color:rgba(255,110,180,.5);}
+
+/* loading */
+.load-bar-outer{background:#111;border-radius:99px;height:16px;overflow:hidden;border:1px solid #330000;}
+.load-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#660000,#ff0000);border-radius:99px;transition:width .08s linear;}
+.load-msg{font-size:.85rem;color:#666;text-align:center;min-height:1.1em;}
+
+/* shake/flicker */
+.shake{display:inline-block;animation:shake .32s infinite;font-family:var(--font-main);
+  font-size:clamp(1.4rem,5.5vw,1.9rem);color:var(--h-text);text-shadow:0 0 18px rgba(255,0,0,.6);text-align:center;}
+@keyframes shake{
+  0%{transform:translate(3px,2px) rotate(-.5deg)}25%{transform:translate(-4px,-2px) rotate(.5deg)}
+  50%{transform:translate(4px,-3px) rotate(-.3deg)}75%{transform:translate(-3px,3px) rotate(.4deg)}
+  100%{transform:translate(3px,-2px) rotate(-.2deg)}}
+@keyframes flicker{0%,90%,100%{opacity:1}91%{opacity:.4}93%{opacity:1}95%{opacity:.2}97%{opacity:1}}
+
+/* flash */
+.flash-overlay{position:fixed;inset:0;background:#ff0000;opacity:0;pointer-events:none;z-index:9000;transition:opacity .05s;}
+/* screen whiteout for candle */
+#whiteout{position:fixed;inset:0;background:#ffffff;opacity:0;pointer-events:none;z-index:8999;transition:opacity .08s;}
+
+/* balloons */
+#balloon-wrap{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden;}
+.balloon{position:absolute;bottom:-60px;animation:rise linear forwards;}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg);opacity:0;}}
+
+/* audio notice */
+#audio-notice{position:fixed;bottom:.8rem;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);
+  border-radius:99px;padding:.35rem 1rem;font-size:.75rem;color:#666;
+  pointer-events:none;transition:opacity .5s;z-index:100;}
+
+/* ══ S1: DASH ══ */
+#stamina-wrap{display:flex;gap:5px;justify-content:center;}
+.stamina-block{width:24px;height:24px;border-radius:4px;background:#1a0000;border:1px solid #330000;transition:background .2s;}
+.stamina-block.alive{background:#ff2200;border-color:#ff4400;box-shadow:0 0 5px rgba(255,34,0,.4);}
+.dist-big{font-family:var(--font-main);font-size:2rem;text-align:center;color:#ff2222;}
+#dist-delta{font-size:.85rem;color:#ff6644;text-align:center;min-height:1.1em;}
+#dash-timer-wrap{text-align:center;}
+.countdown-ring{font-family:var(--font-main);font-size:3.2rem;color:#ff2222;line-height:1;}
+#dash-timer-label{font-size:.76rem;color:#553333;margin-top:-.2rem;}
+
+/* ══ S2: CANDLE ══ */
+#candle-arena{
+  position:relative;width:100%;padding:1rem;
+  background:radial-gradient(ellipse at center,#0d0005 0%,#000 100%);
+  border-radius:14px;border:2px solid #220011;min-height:260px;
+  overflow:hidden;
+}
+.candle-wrap{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.candle-body{width:18px;height:48px;background:linear-gradient(180deg,#ffe0b0,#e8c080);border-radius:3px 3px 2px 2px;}
+.candle-flame{width:22px;height:30px;position:relative;margin-bottom:2px;}
+.candle-flame svg{width:100%;height:100%;}
+.candle-flame.extinguished svg{display:none;}
+.candle-flame.extinguished::after{content:'💨';font-size:1rem;position:absolute;top:-4px;left:50%;transform:translateX(-50%);}
+.candle-wrap.lit .candle-flame{animation:candleFlicker .18s infinite alternate;}
+@keyframes candleFlicker{0%{transform:scaleX(1) scaleY(1)}100%{transform:scaleX(1.08) scaleY(.94)}}
+#candle-progress-label{text-align:center;font-size:.85rem;color:#885544;font-weight:700;}
+#candle-monster{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:5rem;opacity:0;pointer-events:none;transition:opacity .15s;
+  filter:drop-shadow(0 0 20px rgba(255,0,0,.8));
+  z-index:10;
+}
+#candle-freeze-msg{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-main);font-size:1rem;color:#ff2222;
+  white-space:nowrap;opacity:0;transition:opacity .2s;
+}
+#candle-instruct{font-size:.82rem;text-align:center;color:#664433;}
+
+/* ══ S3: SHADOW DOORS ══ */
+.door-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.door-card{aspect-ratio:.55/1;border-radius:10px 10px 3px 3px;border:2px solid #2a0000;
+  background:#0a0000;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;padding-bottom:.5rem;
+  transition:all .18s;font-family:var(--font-main);font-size:.75rem;color:#440000;}
+.door-card:hover{border-color:#ff2222;background:#150000;transform:translateY(-4px);}
+.door-card.correct{border-color:#22dd22!important;background:#001500!important;animation:dPulse .4s ease;}
+.door-card.wrong{animation:dWrong .35s ease;}
+.door-card .di{font-size:1.7rem;margin-bottom:.15rem;}
+@keyframes dPulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes dWrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.shadow-creature{font-size:2.8rem;text-align:center;animation:cFloat 2s ease-in-out infinite;
+  filter:drop-shadow(0 0 12px rgba(255,0,0,.6));}
+@keyframes cFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#door-hp-wrap{display:flex;gap:5px;justify-content:center;}
+.hp-heart{font-size:1.25rem;transition:filter .3s;}
+.hp-heart.lost{filter:grayscale(1) opacity(.25);}
+#door-streak-box{text-align:center;font-size:.9rem;font-weight:700;color:#ff6644;}
+
+/* ══ S4: ROULETTE ══ */
+#roulette-canvas-wrap{display:flex;justify-content:center;position:relative;}
+#roulette-canvas{border-radius:50%;display:block;filter:drop-shadow(0 0 16px rgba(255,0,0,.4));}
+#roulette-needle{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
+  border-bottom:30px solid #ffff00;filter:drop-shadow(0 0 4px rgba(255,255,0,.8));z-index:10;}
+#spin-result-ring{width:100px;height:100px;border-radius:50%;border:4px solid #330000;
+  display:flex;align-items:center;justify-content:center;font-size:1.9rem;
+  margin:0 auto;transition:border-color .3s,background .3s;}
+
+/* ══ S5: TRUST BUTTONS ══ */
+.trust-btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.trust-btn{padding:1rem .5rem;font-family:var(--font-main);font-size:1.1rem;
+  border-radius:10px;border:2px solid #440000;background:#0a0000;color:#ff6644;
+  cursor:pointer;transition:all .2s;letter-spacing:.05em;}
+.trust-btn:hover{border-color:#ff2222;background:#150000;transform:scale(1.04);}
+.trust-btn.correct-flash{border-color:#22dd22!important;background:#002200!important;color:#22ff44!important;}
+.trust-btn.wrong-flash{border-color:#ff4444!important;background:#220000!important;animation:dWrong .3s ease;}
+.trust-target-display{font-family:var(--font-main);font-size:1.6rem;text-align:center;
+  color:#ff2222;letter-spacing:.1em;line-height:1.8;text-shadow:0 0 12px rgba(255,0,0,.5);}
+#trust-progress-wrap{display:flex;gap:8px;justify-content:center;}
+.trust-dot{width:16px;height:16px;border-radius:50%;border:2px solid #440000;background:transparent;transition:all .3s;}
+.trust-dot.done{background:var(--h-text);border-color:var(--h-text);box-shadow:0 0 8px rgba(255,0,0,.5);}
+#trust-msg{font-size:.88rem;text-align:center;color:#553333;min-height:1.1em;}
+#trust-err-msg{font-size:.85rem;text-align:center;color:#ff4444;min-height:1.1em;}
+
+/* ══ S6: HEART GRID ══ */
+.heart-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.heart-cell{aspect-ratio:1;border-radius:10px;border:2px solid rgba(255,110,180,.3);
+  background:rgba(255,110,180,.06);display:flex;align-items:center;justify-content:center;
+  font-size:1.7rem;cursor:pointer;transition:all .18s;}
+.heart-cell:hover{transform:scale(1.08);}
+.heart-cell.glow{animation:hPop .3s ease;}
+@keyframes hPop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+#heart-num-big{font-family:var(--font-main);font-size:2.2rem;text-align:center;color:var(--l-accent);}
+
+/* ══ S7: CONSTELLATION ══ */
+#star-canvas-wrap{position:relative;width:100%;border-radius:16px;overflow:hidden;
+  border:2px solid rgba(255,224,102,.2);background:transparent;}
+#star-bg-canvas{position:absolute;inset:0;width:100%;height:100%;}
+#star-canvas{position:relative;width:100%;display:block;z-index:2;}
+#star-msg{font-size:.85rem;text-align:center;color:#a08866;min-height:1.1em;}
+#star-progress{text-align:center;font-size:.88rem;color:var(--l-star);font-weight:700;}
+.star-complete-msg{font-family:var(--font-main);font-size:1.2rem;text-align:center;
+  color:var(--l-accent);text-shadow:0 0 18px rgba(255,110,180,.6);line-height:1.8;}
+
+/* ══ S8: RED THREAD ══ */
+#thread-arena{position:relative;width:100%;height:320px;
+  background:radial-gradient(ellipse at 50% 30%,#0a001a 0%,#030010 100%);
+  border-radius:14px;border:2px solid #1a0030;overflow:hidden;}
+.thread-item{position:absolute;cursor:pointer;user-select:none;font-size:clamp(1.4rem,4vw,2rem);
+  filter:drop-shadow(0 0 5px rgba(200,0,255,.5));animation:tFloat linear infinite;}
+.thread-item:hover{transform:scale(1.2)!important;}
+@keyframes tFloat{0%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}100%{transform:translateY(0) rotate(-3deg)}}
+.thread-real{filter:drop-shadow(0 0 10px rgba(255,0,180,1))!important;animation:rPulse 1s ease infinite!important;}
+@keyframes rPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(255,0,180,.6))}50%{filter:drop-shadow(0 0 22px rgba(255,0,200,1));}}
+#thread-hint{font-size:.88rem;text-align:center;color:#554455;min-height:1.2em;}
+#thread-attempts{text-align:center;font-size:.88rem;color:#772222;font-weight:700;}
+.thread-spark{position:absolute;pointer-events:none;z-index:10;font-size:1.5rem;
+  animation:sBurst .7s ease forwards;}
+@keyframes sBurst{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(2.2) translate(var(--dx),var(--dy))}}
+
+/* ══ S9: PROPOSAL ══ */
+#proposal-arena{position:relative;height:150px;overflow:hidden;}
+#no-btn{position:absolute;width:36%;transition:top .12s ease,left .12s ease;}
+#no-escape-msg{font-size:.82rem;text-align:center;color:#553333;min-height:1.1em;}
+
+/* ending */
+.ending-text{font-family:var(--font-main);font-size:1.2rem;text-align:center;color:var(--l-accent);
+  line-height:1.9;text-shadow:0 0 14px rgba(255,110,180,.4);}
+.ending-final{border:1px solid rgba(255,110,180,.4);background:rgba(255,110,180,.06);
+  border-radius:12px;padding:1.2rem;text-align:center;font-size:1rem;line-height:2;
+  color:var(--l-text);}
+</style>
+</head>
+<body>
+<div id="game">
+
+<!-- ━━━ S0: 로딩 ━━━ -->
+<div class="stage active" id="s0">
+  <div class="title-horror" style="font-size:clamp(1.2rem,5vw,1.9rem)">👁️ SYSTEM BREACH</div>
+  <div class="narration">— 그녀의 이름이 메아리처럼 울려 퍼진다 —</div>
+  <div id="load-wrap" style="display:none;flex-direction:column;gap:.8rem;">
+    <div class="load-bar-outer"><div class="load-bar-inner" id="load-bar"></div></div>
+    <div class="load-msg" id="load-msg">대기 중...</div>
+  </div>
+  <button class="btn btn-horror" id="btn-s0-start">🩸 &nbsp;데이터 침투 개시 — 이소연</button>
+  <button class="btn btn-horror" id="btn-s0-enter" style="display:none">💀 &nbsp;어둠 속으로 발을 내딛어...</button>
+  <p style="font-size:.72rem;color:#2a2a2a;text-align:center">※ 클릭 후 소리가 켜집니다</p>
+</div>
+
+<!-- ━━━ S1: 달리기 ━━━ -->
+<div class="stage" id="s1">
+  <div class="shake" id="shake-text">🔪 뒤에 있어... 소연아, 달려!! 🔪</div>
+  <div class="img-box" id="img-scary"><div class="img-ph"><div class="ic">👁️</div><div>scary.jpg</div></div></div>
+  <div class="dist-big">🏃 <span id="dist-num">300</span>m</div>
+  <div id="dist-delta">&nbsp;</div>
+  <div class="prog-wrap"><div class="prog-bar" id="dist-bar" style="width:100%"></div></div>
+  <div id="dash-timer-wrap" style="display:none">
+    <div class="countdown-ring" id="dash-timer">4</div>
+    <div id="dash-timer-label">멈추면... 잡힌다</div>
+  </div>
+  <div id="stamina-wrap"></div>
+  <button class="btn btn-horror" id="btn-run" style="font-size:1.4rem;padding:1.1rem">🏃 달려!! 달려!! 클릭!!</button>
+  <button class="btn btn-horror" id="btn-escape-room" style="display:none">🚪 저기— 탈출구다!! 뛰어!!</button>
+</div>
+
+<!-- ━━━ S2: 촛불 끄기 ━━━ -->
+<div class="stage" id="s2">
+  <div class="title-horror" style="font-size:1.4rem">🕯️ 심연의 촛불</div>
+  <div class="narration">— 그림자 안에 무언가가 있다.<br>들키기 전에... 불을 꺼. —</div>
+  <div id="candle-progress-label">남은 촛불: <span id="candle-left">6</span> / 6</div>
+  <div id="candle-arena">
+    <div id="candle-monster">👾</div>
+    <div id="candle-freeze-msg">🛑 움직이지 마...</div>
+  </div>
+  <div id="candle-instruct">🕯️ 촛불이 빨갛게 타오를 때 클릭해서 꺼라!</div>
+  <div class="sbox bad" id="candle-fail-box" style="display:none">💀 괴물이 깨어났다...</div>
+  <button class="btn btn-horror" id="btn-candle-retry" style="display:none">🩸 다시... 조용히...</button>
+  <button class="btn btn-horror" id="btn-candle-next" style="display:none">🚪 불이 꺼졌다. 도망쳐!!</button>
+</div>
+
+<!-- ━━━ S3: 그림자 문 ━━━ -->
+<div class="stage" id="s3">
+  <div class="title-horror" style="font-size:1.35rem">🚪 그림자 뒤의 진실</div>
+  <div class="narration">— 문 하나하나에 운명이 숨어있다 —</div>
+  <div class="shadow-creature" id="shadow-creature">👾</div>
+  <div id="door-streak-box">연속 정답: <span id="streak-num">0</span> &nbsp;|&nbsp; 목표: <span id="streak-goal">2</span>연속</div>
+  <div id="door-hp-wrap">
+    <span class="hp-heart" id="hp0">❤️</span>
+    <span class="hp-heart" id="hp1">❤️</span>
+    <span class="hp-heart" id="hp2">❤️</span>
+  </div>
+  <div class="door-grid" id="door-grid"></div>
+  <div class="sbox bad" id="door-dead-box" style="display:none">💀 그림자에 삼켜졌다...</div>
+  <button class="btn btn-horror" id="btn-retry-door" style="display:none">🩸 다시 일어서...</button>
+  <button class="btn btn-horror" id="btn-door-next" style="display:none">🔦 빛이 보인다— 달려!!</button>
+</div>
+
+<!-- ━━━ S4: 룰렛 ━━━ -->
+<div class="stage" id="s4">
+  <div class="shake" style="font-size:1.7rem">💀 죽음의 룰렛 💀</div>
+  <div class="narration">— 운명이 결정된다. 두 번 통과하면... 살아남는다 —</div>
+  <div id="roulette-canvas-wrap">
+    <canvas id="roulette-canvas" width="260" height="260"></canvas>
+    <div id="roulette-needle"></div>
+  </div>
+  <div id="spin-result-ring">❓</div>
+  <div id="roulette-status" class="sbox" style="display:none"></div>
+  <div style="text-align:center;font-size:.95rem;color:#ff6644;font-weight:700">연속 통과: <span id="combo-num">0</span> / 2</div>
+  <button class="btn btn-horror" id="roulette-spin-btn">🎰 운명을 돌려라...</button>
+  <button class="btn btn-horror" id="btn-to-trust" style="display:none">🩸 살았다... 빠져나가...</button>
+</div>
+
+<!-- ━━━ S5: 믿음 선택 ━━━ -->
+<div class="stage" id="s5">
+  <div class="title-horror" style="font-size:1.3rem">소연아... 날 믿어줄 수 있어?</div>
+  <div class="narration">— 정답을 골라. 눈을 감고, 느껴봐 —</div>
+  <div class="trust-target-display" id="trust-target-display">— ? —</div>
+  <div class="trust-btn-grid" id="trust-btn-grid"></div>
+  <div id="trust-progress-wrap">
+    <div class="trust-dot" id="td0"></div>
+    <div class="trust-dot" id="td1"></div>
+    <div class="trust-dot" id="td2"></div>
+  </div>
+  <div id="trust-msg">1 / 3</div>
+  <div id="trust-err-msg">&nbsp;</div>
+</div>
+
+<!-- ━━━ S6: 반전 고백 ━━━ -->
+<div class="stage" id="s6">
+  <div class="title-love">🌹 소연아... 잠깐만 🌹</div>
+  <div class="narration">— 사실은... 처음부터 계획이 있었어 —</div>
+  <div class="img-box love-frame" id="img-cute"><div class="img-ph" style="background:rgba(255,110,180,.05);color:#ff6eb4"><div class="ic">🌸</div><div>cute.jpg</div></div></div>
+  <button class="btn btn-love" id="btn-to-heart">💖 나의 진심을... 확인해볼래?</button>
+</div>
+
+<!-- ━━━ S7: 하트 그리드 ━━━ -->
+<div class="stage" id="s7">
+  <div class="title-love" style="font-size:1.4rem">내 마음을 받아줘 💖</div>
+  <div class="narration">— 어둠 속에 숨겨진 진심을 찾아줘 —</div>
+  <div id="heart-num-big"><span id="heart-num">0</span> / 6</div>
+  <div class="prog-wrap love"><div class="prog-bar" id="heart-bar" style="width:0%"></div></div>
+  <div class="heart-grid" id="heart-grid"></div>
+  <button class="btn btn-love" id="btn-to-stars" style="display:none">🌌 밤하늘이 우리를 기다려...</button>
+</div>
+
+<!-- ━━━ S8: 별자리 잇기 ━━━ -->
+<div class="stage" id="s8">
+  <div class="title-love" style="font-size:1.3rem;color:var(--l-star)">🌌 우리만의 별자리</div>
+  <div class="narration">— 별들을 순서대로 클릭해봐.<br>우리만의 이야기가 하늘에 새겨질 거야 —</div>
+  <div id="star-canvas-wrap">
+    <canvas id="star-bg-canvas"></canvas>
+    <canvas id="star-canvas"></canvas>
+  </div>
+  <div id="star-progress">0 / 12 연결됨</div>
+  <div id="star-msg">&nbsp;</div>
+  <button class="btn btn-love" id="btn-star-next" style="display:none">💫 별자리가 완성됐어... 다음으로</button>
+</div>
+
+<!-- ━━━ S9: 붉은 실 ━━━ -->
+<div class="stage" id="s9">
+  <div class="title-love" style="font-size:1.35rem;color:#ff88cc">🧵 운명의 붉은 실</div>
+  <div class="narration">— 수많은 것들 중, 진짜는 단 하나.<br>그게 바로 나야 —</div>
+  <div id="thread-arena"></div>
+  <div id="thread-hint">&nbsp;</div>
+  <div id="thread-attempts">남은 기회: <span id="thread-tries">7</span></div>
+  <button class="btn btn-horror" id="btn-thread-retry" style="display:none">🩸 다시 찾아볼게...</button>
+  <button class="btn btn-love" id="btn-thread-next" style="display:none">💌 드디어... 마지막이야</button>
+</div>
+
+<!-- ━━━ S10: 프로포즈 ━━━ -->
+<div class="stage" id="s10">
+  <div class="title-love">소연아... 영원히 나랑 함께해줄래?</div>
+  <div class="narration">— 이 질문 하나를 위해 여기까지 왔어 —</div>
+  <div id="proposal-arena">
+    <button class="btn btn-love" id="yes-btn" style="position:absolute;width:52%;top:50%;left:8%;transform:translateY(-50%)">✨ YES! ✨</button>
+    <button class="btn btn-horror" id="no-btn">NO</button>
+  </div>
+  <div id="no-escape-msg">&nbsp;</div>
+</div>
+
+<!-- ━━━ S11: 엔딩 ━━━ -->
+<div class="stage" id="s11">
+  <div class="title-love">🎉 새로운 이야기의 시작 🎉</div>
+  <div class="img-box love-frame" id="img-final"><div class="img-ph" style="background:rgba(255,110,180,.05);color:#ff6eb4"><div class="ic">💑</div><div>final.jpg</div></div></div>
+  <div class="ending-text">공포도, 어둠도, 모든 게 다<br>너를 향한 무대였어, 소연아</div>
+  <div class="ending-final">
+    ずっと一緒にいてくれる？<br>
+    <span style="font-size:1.2rem;color:var(--l-accent)">I LOVE YOU 💖</span>
+  </div>
+  <button class="btn btn-love" id="btn-restart">🔄 처음부터</button>
+</div>
+
+</div><!-- #game -->
+
+<audio id="aud-scary" loop preload="auto"><source src="bgm_scary.mp3" type="audio/mpeg"></audio>
+<audio id="aud-love"  loop preload="auto"><source src="bgm_love.mp3"  type="audio/mpeg"></audio>
+<div id="balloon-wrap"></div>
+<div class="flash-overlay" id="flash"></div>
+<div id="whiteout"></div>
+<div id="audio-notice">🔇 클릭하면 소리가 켜져요</div>
+
+<script>
+/* ════════════════ STATE ════════════════ */
+const S={
+  audioUnlocked:false,currentAudio:null,
+  dist:300,maxDist:300,stamina:5,dashTI:null,dashTimerVal:0,
+  candleLit:6,candleFreeze:false,candleDone:false,
+  doorStreak:0,doorHP:3,
+  rCombo:0,rSpinning:false,
+  trustDone:0,trustIdx:0,trustAnswer:null,trustLocked:false,
+  heartCount:0,
+  starNext:0,starDone:false,
+  threadTries:7,threadFound:false,threadLocked:false,
+  noEscapes:0,
+};
+
+/* ════════════════ AUDIO ════════════════ */
+const audS=document.getElementById('aud-scary'),audL=document.getElementById('aud-love');
+audS.volume=.45;audL.volume=.5;
+function unlockAudio(){
+  if(S.audioUnlocked)return;S.audioUnlocked=true;
+  document.getElementById('audio-notice').style.opacity='0';
+  if(S.currentAudio)S.currentAudio.play().catch(()=>{});
+}
+document.addEventListener('click',unlockAudio,{once:true});
+function switchAudio(t){
+  if(t==='scary'){if(!audS.paused)return;audL.pause();S.currentAudio=audS;if(S.audioUnlocked)audS.play().catch(()=>{});}
+  else{if(!audL.paused)return;audS.pause();S.currentAudio=audL;if(S.audioUnlocked)audL.play().catch(()=>{});}
+}
+
+/* ════════════════ UTILS ════════════════ */
+function goStage(id){
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  const loveStages=['s6','s7','s8','s9','s10','s11'];
+  if(loveStages.includes(id)){document.body.classList.add('love-mode');switchAudio('love');}
+  else if(id!=='s0'){document.body.classList.remove('love-mode');switchAudio('scary');}
+}
+function tryLoadImg(id,src){
+  const w=document.getElementById(id);if(!w)return;
+  const i=new Image();i.onload=()=>{w.innerHTML=`<img src="${src}" alt="">`;};i.src=src;
+}
+function flashScreen(col,dur){
+  const f=document.getElementById('flash');
+  f.style.background=col||'#ff0000';f.style.opacity='.55';
+  setTimeout(()=>f.style.opacity='0',dur||120);
+}
+function whiteFlash(dur){
+  const w=document.getElementById('whiteout');
+  w.style.opacity='.85';
+  setTimeout(()=>w.style.opacity='0',dur||120);
+}
+function launchBalloons(){
+  const wrap=document.getElementById('balloon-wrap');
+  const em=['🎈','💖','🌹','✨','💕','🎉','🌸','💫','⭐'];
+  for(let i=0;i<24;i++){
+    const b=document.createElement('div');b.className='balloon';
+    b.textContent=em[Math.floor(Math.random()*em.length)];
+    b.style.left=Math.random()*100+'vw';
+    b.style.animationDuration=(2+Math.random()*3.5)+'s';
+    b.style.animationDelay=(Math.random()*2)+'s';
+    b.style.fontSize=(1.2+Math.random()*1.8)+'rem';
+    wrap.appendChild(b);b.addEventListener('animationend',()=>b.remove());
+  }
+}
+
+/* ════════════════ S0: LOADING ════════════════ */
+let loadDone=false;
+document.getElementById('btn-s0-start').addEventListener('click',function(){
+  if(loadDone)return;
+  this.disabled=true;this.style.opacity='.3';
+  document.getElementById('load-wrap').style.display='flex';
+  const bar=document.getElementById('load-bar'),msg=document.getElementById('load-msg');
+  const msgs=['영혼의 주파수를 맞추는 중...','어둠 속 경로를 탐색 중...','보안 필터를 파괴 중...','소연이의 데이터를 복원 중...','— 접속 완료 —'];
+  let p=0;
+  const iv=setInterval(()=>{
+    p=Math.min(p+1,100);bar.style.width=p+'%';
+    msg.textContent=msgs[Math.min(Math.floor(p/20),msgs.length-1)];
+    if(p>=100){clearInterval(iv);loadDone=true;document.getElementById('btn-s0-enter').style.display='block';}
+  },75);
+});
+document.getElementById('btn-s0-enter').addEventListener('click',()=>{
+  tryLoadImg('img-scary','scary.jpg');initDash();goStage('s1');
+});
+
+/* ════════════════ S1: DASH ════════════════ */
+function initDash(){
+  S.dist=300;S.maxDist=300;S.stamina=5;
+  clearInterval(S.dashTI);
+  document.getElementById('dist-num').textContent=300;
+  document.getElementById('dist-bar').style.width='100%';
+  document.getElementById('dist-delta').textContent='\u00a0';
+  document.getElementById('btn-run').style.display='block';
+  document.getElementById('btn-escape-room').style.display='none';
+  document.getElementById('shake-text').textContent='🔪 뒤에 있어... 소연아, 달려!! 🔪';
+  buildStamina();startDashTimer();
+}
+function buildStamina(){
+  const w=document.getElementById('stamina-wrap');w.innerHTML='';
+  for(let i=0;i<5;i++){
+    const b=document.createElement('div');
+    b.className='stamina-block'+(i<S.stamina?' alive':'');
+    b.id='sb'+i;w.appendChild(b);
+  }
+}
+function startDashTimer(){
+  clearInterval(S.dashTI);S.dashTimerVal=4;
+  const tw=document.getElementById('dash-timer-wrap');tw.style.display='block';
+  const el=document.getElementById('dash-timer');el.textContent=4;
+  S.dashTI=setInterval(()=>{
+    S.dashTimerVal--;el.textContent=S.dashTimerVal;
+    if(S.dashTimerVal<=0){
+      clearInterval(S.dashTI);
+      const p=12+Math.floor(Math.random()*22);
+      S.dist=Math.min(S.dist+p,360);S.maxDist=Math.max(S.maxDist,S.dist);
+      document.getElementById('dist-num').textContent=S.dist;
+      document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
+      document.getElementById('dist-delta').textContent='⚠️ 너무 느려!! +'+p+'m 증가!';
+      flashScreen('#ff0000',220);
+      if(S.stamina>0){S.stamina--;const sb=document.getElementById('sb'+S.stamina);if(sb)sb.classList.remove('alive');}
+      if(S.stamina<=0){S.stamina=1;const sb=document.getElementById('sb0');if(sb)sb.classList.add('alive');}
+      startDashTimer();
+    }
+  },1000);
+}
+document.getElementById('btn-run').addEventListener('click',function(){
+  clearInterval(S.dashTI);
+  const r=10+Math.floor(Math.random()*10);
+  S.dist=Math.max(0,S.dist-r);
+  document.getElementById('dist-num').textContent=S.dist;
+  document.getElementById('dist-bar').style.width=(S.dist/S.maxDist*100)+'%';
+  document.getElementById('dist-delta').textContent='▼ -'+r+'m!';
+  if(S.dist<=0){
+    clearInterval(S.dashTI);
+    document.getElementById('dash-timer-wrap').style.display='none';
+    this.style.display='none';
+    document.getElementById('btn-escape-room').style.display='block';
+    document.getElementById('shake-text').textContent='🚪 저기— 탈출구다!! 뛰어!!';
+  } else {startDashTimer();}
+});
+document.getElementById('btn-escape-room').addEventListener('click',()=>{
+  clearInterval(S.dashTI);initCandle();goStage('s2');
+});
+
+/* ════════════════ S2: CANDLE ════════════════ */
+const CANDLE_COUNT=6;
+let candleStates=[];       // true=lit, false=extinguished
+let candleIntervals=[];    // per-candle blink interval
+let monsterInterval=null;
+let monsterShowing=false;
+
+function initCandle(){
+  S.candleLit=CANDLE_COUNT;S.candleFreeze=false;S.candleDone=false;
+  candleStates=Array(CANDLE_COUNT).fill(true);
+  candleIntervals.forEach(clearInterval);candleIntervals=[];
+  clearInterval(monsterInterval);monsterShowing=false;
+  document.getElementById('candle-left').textContent=CANDLE_COUNT;
+  document.getElementById('candle-fail-box').style.display='none';
+  document.getElementById('btn-candle-retry').style.display='none';
+  document.getElementById('btn-candle-next').style.display='none';
+  document.getElementById('candle-instruct').style.display='block';
+  buildCandleArena();
+  startMonsterCycle();
+}
+
+function buildCandleArena(){
+  const arena=document.getElementById('candle-arena');
+  // remove old candles but keep monster and freeze msg
+  arena.querySelectorAll('.candle-wrap').forEach(c=>c.remove());
+
+  const positions=[
+    {x:8,y:15},{x:22,y:55},{x:38,y:20},{x:55,y:60},{x:70,y:18},{x:84,y:50}
+  ];
+  positions.forEach((pos,idx)=>{
+    const wrap=document.createElement('div');
+    wrap.className='candle-wrap lit';
+    wrap.style.cssText=`left:${pos.x}%;top:${pos.y}%;`;
+    wrap.innerHTML=`
+      <div class="candle-flame" id="cf${idx}">
+        <svg viewBox="0 0 22 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="11" cy="22" rx="9" ry="8" fill="#ff6600" opacity=".7"/>
+          <ellipse cx="11" cy="14" rx="6" ry="11" fill="#ffaa00"/>
+          <ellipse cx="11" cy="10" rx="3" ry="7" fill="#ffee88" opacity=".9"/>
+        </svg>
+      </div>
+      <div class="candle-body"></div>`;
+    // blink red at intervals to signal "clickable"
+    let litPhase=false;
+    const blink=setInterval(()=>{
+      if(!candleStates[idx])return;
+      litPhase=!litPhase;
+      const svgEls=wrap.querySelectorAll('ellipse');
+      if(litPhase){
+        svgEls[0].setAttribute('fill','#ff0000');
+        svgEls[1].setAttribute('fill','#ff2200');
+        svgEls[2].setAttribute('fill','#ff6644');
+      } else {
+        svgEls[0].setAttribute('fill','#ff6600');
+        svgEls[1].setAttribute('fill','#ffaa00');
+        svgEls[2].setAttribute('fill','#ffee88');
+      }
+    },600+Math.random()*400);
+    candleIntervals.push(blink);
+
+    wrap.addEventListener('click',()=>{
+      if(S.candleFreeze||S.candleDone||!candleStates[idx])return;
+      extinguishCandle(idx,wrap);
+    });
+    arena.appendChild(wrap);
+  });
+}
+
+function extinguishCandle(idx,wrap){
+  candleStates[idx]=false;
+  clearInterval(candleIntervals[idx]);
+  const flameEl=wrap.querySelector('.candle-flame');
+  flameEl.classList.add('extinguished');
+  S.candleLit--;
+  document.getElementById('candle-left').textContent=S.candleLit;
+  if(S.candleLit<=0){
+    S.candleDone=true;
+    clearInterval(monsterInterval);
+    document.getElementById('candle-monster').style.opacity='0';
+    document.getElementById('candle-instruct').style.display='none';
+    document.getElementById('btn-candle-next').style.display='block';
+  }
+}
+
+function startMonsterCycle(){
+  // random interval: show monster, player must STOP clicking
+  monsterInterval=setInterval(()=>{
+    if(S.candleDone||S.candleFreeze)return;
+    showMonster();
+  }, 3500+Math.random()*2500);
+}
+
+function showMonster(){
+  if(S.candleDone)return;
+  S.candleFreeze=true;
+  monsterShowing=true;
+  const mon=document.getElementById('candle-monster');
+  const fmsg=document.getElementById('candle-freeze-msg');
+  const MONSTERS=['👾','🧟','💀','👁️','🕷️'];
+  mon.textContent=MONSTERS[Math.floor(Math.random()*MONSTERS.length)];
+  mon.style.opacity='1';
+  fmsg.style.opacity='1';
+  whiteFlash(80);
+
+  // temporary click trap: if user clicks during freeze, fail
+  const trapHandler=()=>{
+    if(!S.candleFreeze||S.candleDone)return;
+    candleFail();
+  };
+  document.getElementById('candle-arena').addEventListener('click',trapHandler,{once:true});
+
+  const hideDelay=1200+Math.random()*800;
+  setTimeout(()=>{
+    if(!S.candleDone){
+      mon.style.opacity='0';fmsg.style.opacity='0';
+      S.candleFreeze=false;monsterShowing=false;
+      document.getElementById('candle-arena').removeEventListener('click',trapHandler);
+    }
+  },hideDelay);
+}
+
+function candleFail(){
+  S.candleFreeze=true;S.candleDone=true;
+  clearInterval(monsterInterval);
+  flashScreen('#ff0000',300);
+  document.getElementById('candle-fail-box').style.display='block';
+  document.getElementById('btn-candle-retry').style.display='block';
+  document.getElementById('candle-monster').style.opacity='1';
+}
+
+document.getElementById('btn-candle-retry').addEventListener('click',()=>{
+  initCandle();
+});
+document.getElementById('btn-candle-next').addEventListener('click',()=>{
+  clearInterval(monsterInterval);initDoors();goStage('s3');
+});
+
+/* ════════════════ S3: SHADOW DOORS ════════════════ */
+const CREATURES=['👾','🦷','💀','🕷️','🧟','👁️','🩸','🌑'];
+const DLABELS=['???','...','꽝?','>_<','운명','탈출','살길?'];
+function initDoors(){
+  S.doorStreak=0;S.doorHP=3;
+  document.getElementById('streak-num').textContent=0;
+  document.getElementById('door-dead-box').style.display='none';
+  document.getElementById('btn-retry-door').style.display='none';
+  document.getElementById('btn-door-next').style.display='none';
+  document.getElementById('door-grid').style.display='grid';
+  for(let i=0;i<3;i++){const h=document.getElementById('hp'+i);if(h){h.className='hp-heart';h.textContent='❤️';}}
+  buildDoors();rotateShadow();
+}
+function buildDoors(){
+  const g=document.getElementById('door-grid');g.innerHTML='';
+  const safeIdx=Math.floor(Math.random()*5);
+  for(let i=0;i<5;i++){
+    const d=document.createElement('div');d.className='door-card';
+    d.innerHTML=`<div class="di">🚪</div><div>${DLABELS[Math.floor(Math.random()*DLABELS.length)]}</div>`;
+    d.dataset.safe=(i===safeIdx)?'1':'0';
+    d.addEventListener('click',()=>onDoorClick(d));
+    g.appendChild(d);
+  }
+}
+function rotateShadow(){
+  document.getElementById('shadow-creature').textContent=CREATURES[Math.floor(Math.random()*CREATURES.length)];
+}
+function onDoorClick(d){
+  if(d.dataset.used==='1')return;
+  d.dataset.used='1';
+  document.querySelectorAll('.door-card').forEach(c=>c.dataset.used='1');
+  if(d.dataset.safe==='1'){
+    d.classList.add('correct');S.doorStreak++;
+    document.getElementById('streak-num').textContent=S.doorStreak;
+    rotateShadow();
+    if(S.doorStreak>=2){
+      setTimeout(()=>{document.getElementById('door-grid').style.display='none';document.getElementById('btn-door-next').style.display='block';},500);
+    } else {setTimeout(buildDoors,600);}
+  } else {
+    d.classList.add('wrong');flashScreen('#ff0000',160);S.doorStreak=0;
+    document.getElementById('streak-num').textContent=0;
+    S.doorHP--;
+    const hEl=document.getElementById('hp'+S.doorHP);
+    if(hEl){hEl.classList.add('lost');hEl.textContent='🖤';}
+    if(S.doorHP<=0){
+      document.getElementById('door-grid').style.display='none';
+      document.getElementById('door-dead-box').style.display='block';
+      document.getElementById('btn-retry-door').style.display='block';
+    } else {setTimeout(buildDoors,600);}
+  }
+}
+document.getElementById('btn-retry-door').addEventListener('click',initDoors);
+document.getElementById('btn-door-next').addEventListener('click',()=>{
+  document.getElementById('door-grid').style.display='grid';
+  initRoulette();goStage('s4');
+});
+
+/* ════════════════ S4: ROULETTE ════════════════ */
+const RC=document.getElementById('roulette-canvas');
+const RCX=RC.getContext('2d');
+const RSEGS=['통과','꽝','통과','꽝','통과','꽝','통과','꽝'];
+const RCOLS=['#003300','#330000','#004400','#440000','#005500','#440000','#003300','#550000'];
+const RTCOLS=['#22ff44','#ff4444','#33ff55','#ff5555','#44ff66','#ff4444','#33ff44','#ff6655'];
+let rAngle=0;
+function drawWheel(a){
+  const cx=130,cy=130,r=120,n=RSEGS.length,sl=(2*Math.PI)/n,off=a*Math.PI/180;
+  RCX.clearRect(0,0,260,260);
+  for(let i=0;i<n;i++){
+    const st=off+i*sl;
+    RCX.beginPath();RCX.moveTo(cx,cy);RCX.arc(cx,cy,r,st,st+sl);RCX.closePath();
+    RCX.fillStyle=RCOLS[i];RCX.fill();
+    RCX.strokeStyle='#1a1a1a';RCX.lineWidth=1.5;RCX.stroke();
+    RCX.save();RCX.translate(cx,cy);RCX.rotate(st+sl/2);
+    RCX.fillStyle=RTCOLS[i];RCX.font='bold 13px "Black Han Sans",sans-serif';
+    RCX.textAlign='center';RCX.textBaseline='middle';
+    RCX.fillText(RSEGS[i],r*.65,0);RCX.restore();
+  }
+  RCX.beginPath();RCX.arc(cx,cy,16,0,2*Math.PI);
+  RCX.fillStyle='#0a0000';RCX.fill();
+  RCX.strokeStyle='#ff2222';RCX.lineWidth=2;RCX.stroke();
+}
+function initRoulette(){
+  S.rCombo=0;S.rSpinning=false;rAngle=0;
+  document.getElementById('combo-num').textContent=0;
+  document.getElementById('roulette-status').style.display='none';
+  const btn=document.getElementById('roulette-spin-btn');
+  btn.style.display='block';btn.disabled=false;btn.textContent='🎰 운명을 돌려라...';
+  document.getElementById('btn-to-trust').style.display='none';
+  document.getElementById('spin-result-ring').textContent='❓';
+  document.getElementById('spin-result-ring').style.borderColor='#330000';
+  document.getElementById('spin-result-ring').style.background='transparent';
+  drawWheel(0);
+}
+document.getElementById('roulette-spin-btn').addEventListener('click',function(){
+  if(S.rSpinning)return;
+  S.rSpinning=true;
+  const spinBtn=document.getElementById('roulette-spin-btn');
+  spinBtn.disabled=true;spinBtn.textContent='⏳ 돌아가고 있어...';
+  const extra=(5+Math.floor(Math.random()*5))*360;
+  const stop=Math.floor(Math.random()*360);
+  const total=extra+stop;
+  const dur=3200,t0=performance.now(),a0=rAngle;
+  const ease=t=>1-Math.pow(1-t,3);
+  function anim(now){
+    const t=Math.min((now-t0)/dur,1);
+    rAngle=(a0+total*ease(t))%360;
+    drawWheel(rAngle);
+    if(t<1){requestAnimationFrame(anim);return;}
+    const sl=360/RSEGS.length;
+    const na=(360-rAngle%360+270)%360;
+    const idx=Math.floor(na/sl)%RSEGS.length;
+    const pass=RSEGS[idx]==='통과';
+    const ring=document.getElementById('spin-result-ring');
+    const st=document.getElementById('roulette-status');
+    st.style.display='block';
+    if(pass){
+      S.rCombo++;
+      document.getElementById('combo-num').textContent=S.rCombo;
+      ring.textContent='✅';ring.style.borderColor='#22dd22';ring.style.background='#002200';
+      st.className='sbox ok';st.textContent='🎉 '+S.rCombo+'회 통과! 한 번 더!';
+      if(S.rCombo>=2){
+        st.textContent='🔓 살았어... 빠져나가!!';
+        spinBtn.style.display='none';
+        document.getElementById('btn-to-trust').style.display='block';
+        S.rSpinning=false;return;
+      }
+    } else {
+      S.rCombo=0;
+      document.getElementById('combo-num').textContent=0;
+      ring.textContent='💀';ring.style.borderColor='#ff4444';ring.style.background='#220000';
+      st.className='sbox bad';st.textContent='💀 [꽝]... 다시 돌려야 해';
+      flashScreen('#ff0000',200);
+    }
+    setTimeout(()=>{
+      S.rSpinning=false;spinBtn.disabled=false;
+      spinBtn.style.display='block';spinBtn.textContent='🎰 운명을 돌려라...';
+    },700);
+  }
+  requestAnimationFrame(anim);
+});
+document.getElementById('btn-to-trust').addEventListener('click',()=>{initTrust();goStage('s5');});
+
+/* ════════════════ S5: TRUST BUTTON SELECTION ════════════════ */
+// Questions: target word shown, player picks from 3 buttons
+// All in Japanese-friendly: single emoji or short universal text
+const TRUST_ROUNDS=[
+  {target:'💖', options:['💖','💀','👾'], hint:'— 어느 게 내 마음이야? —'},
+  {target:'함께', options:['혼자','함께','이별'], hint:'— 우리가 걸어갈 길은? —'},
+  {target:'YES', options:['NO','YES','...'], hint:'— 마지막 대답은? —'},
+];
+function initTrust(){
+  S.trustDone=0;S.trustIdx=0;S.trustAnswer=null;S.trustLocked=false;
+  document.getElementById('trust-msg').textContent='1 / 3';
+  document.getElementById('trust-err-msg').textContent='\u00a0';
+  for(let i=0;i<3;i++){const d=document.getElementById('td'+i);if(d)d.className='trust-dot';}
+  showTrustRound();
+}
+function showTrustRound(){
+  const round=TRUST_ROUNDS[S.trustIdx];
+  document.getElementById('trust-target-display').textContent=round.target;
+  document.getElementById('trust-err-msg').textContent=round.hint;
+  S.trustLocked=false;
+  // shuffle options
+  const opts=[...round.options].sort(()=>Math.random()-.5);
+  const grid=document.getElementById('trust-btn-grid');grid.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='trust-btn';b.textContent=opt;
+    b.addEventListener('click',()=>onTrustClick(b,opt,round.target));
+    grid.appendChild(b);
+  });
+}
+function onTrustClick(btn,chosen,target){
+  if(S.trustLocked)return;S.trustLocked=true;
+  if(chosen===target){
+    btn.classList.add('correct-flash');
+    const dot=document.getElementById('td'+S.trustDone);
+    if(dot)dot.classList.add('done');
+    S.trustDone++;S.trustIdx++;
+    document.getElementById('trust-msg').textContent=S.trustDone+' / 3';
+    document.getElementById('trust-err-msg').textContent='✨ 맞아... 그거야';
+    if(S.trustDone>=3){
+      setTimeout(()=>{launchBalloons();tryLoadImg('img-cute','cute.jpg');goStage('s6');},500);
+    } else {setTimeout(showTrustRound,700);}
+  } else {
+    btn.classList.add('wrong-flash');
+    document.getElementById('trust-err-msg').textContent='❌ 아니야... 다시 느껴봐';
+    flashScreen('#220000',120);
+    setTimeout(()=>{btn.classList.remove('wrong-flash');S.trustLocked=false;},500);
+  }
+}
+document.getElementById('btn-to-heart').addEventListener('click',()=>{initHearts();goStage('s7');});
+
+/* ════════════════ S7: HEART GRID ════════════════ */
+function initHearts(){
+  S.heartCount=0;
+  document.getElementById('heart-num').textContent=0;
+  document.getElementById('heart-bar').style.width='0%';
+  document.getElementById('btn-to-stars').style.display='none';
+  buildHeartGrid();
+}
+function buildHeartGrid(){
+  const g=document.getElementById('heart-grid');
+  g.innerHTML='';g.style.pointerEvents='auto';g.style.opacity='1';
+  const total=16,positions=new Set();
+  while(positions.size<3)positions.add(Math.floor(Math.random()*total));
+  for(let i=0;i<total;i++){
+    const c=document.createElement('div');c.className='heart-cell';
+    c.textContent=positions.has(i)?'💖':'🤍';
+    c.addEventListener('click',()=>onHeartClick(c,positions.has(i)));
+    g.appendChild(c);
+  }
+}
+function onHeartClick(c,isH){
+  if(isH){
+    c.classList.add('glow');S.heartCount++;
+    document.getElementById('heart-num').textContent=S.heartCount;
+    document.getElementById('heart-bar').style.width=(S.heartCount/6*100)+'%';
+    if(S.heartCount>=6){
+      document.getElementById('btn-to-stars').style.display='block';
+      document.getElementById('heart-grid').style.pointerEvents='none';
+      document.getElementById('heart-grid').style.opacity='.3';
+    } else {setTimeout(buildHeartGrid,380);}
+  } else {
+    c.textContent='💔';c.style.background='rgba(255,100,150,.12)';
+    setTimeout(()=>{c.textContent='🤍';c.style.background='';},400);
+  }
+}
+document.getElementById('btn-to-stars').addEventListener('click',()=>{initStars();goStage('s8');});
+
+/* ════════════════ S8: CONSTELLATION ════════════════ */
+// Heart shape: 12 stars forming a heart, click in order 1→12
+let starCanvas,starCtx,starBgCanvas,starBgCtx;
+let starPoints=[],starLines=[],starParticles=[],starAnimId=null;
+let bgStars=[];
+
+// Heart-shaped coordinates (normalized 0-1, will be scaled to canvas)
+const HEART_PTS_NORM=[
+  [.50,.18],[.65,.10],[.80,.14],[.90,.27],[.85,.42],
+  [.72,.57],[.60,.68],[.50,.80],
+  [.40,.68],[.28,.57],[.15,.42],[.10,.27],[.20,.14],[.35,.10]
+].slice(0,12); // 12 points
+
+function initStars(){
+  S.starNext=0;S.starDone=false;
+  starLines=[];starParticles=[];
+  if(starAnimId)cancelAnimationFrame(starAnimId);
+
+  starCanvas=document.getElementById('star-canvas');
+  starBgCanvas=document.getElementById('star-bg-canvas');
+
+  const wrap=document.getElementById('star-canvas-wrap');
+  const W=wrap.clientWidth||350;
+  const H=Math.round(W*1.0);
+  starCanvas.width=W;starCanvas.height=H;
+  starBgCanvas.width=W;starBgCanvas.height=H;
+  starBgCanvas.style.width=W+'px';starBgCanvas.style.height=H+'px';
+  starCanvas.style.width=W+'px';starCanvas.style.height=H+'px';
+  wrap.style.height=H+'px';
+
+  starCtx=starCanvas.getContext('2d');
+  starBgCtx=starBgCanvas.getContext('2d');
+
+  // Scale heart points to canvas
+  starPoints=HEART_PTS_NORM.map((p,i)=>({
+    x:p[0]*W*0.82+W*0.09,
+    y:p[1]*H*0.82+H*0.07,
+    num:i+1,lit:false,
+  }));
+
+  // Generate background twinkle stars
+  bgStars=Array.from({length:80},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:0.5+Math.random()*1.5,
+    a:Math.random(),da:(Math.random()-.5)*.015,
+  }));
+
+  drawStarScene();
+  document.getElementById('star-progress').textContent='0 / 12 연결됨';
+  document.getElementById('star-msg').textContent='✨ 별을 순서대로 클릭해봐';
+  document.getElementById('btn-star-next').style.display='none';
+
+  starCanvas.addEventListener('click',onStarClick);
+  starCanvas.addEventListener('touchstart',onStarTouch,{passive:true});
+  startStarAnim();
+}
+
+function startStarAnim(){
+  function loop(){
+    // animate bg stars
+    starBgCtx.clearRect(0,0,starBgCanvas.width,starBgCanvas.height);
+    // deep space bg
+    const grd=starBgCtx.createRadialGradient(starBgCanvas.width/2,starBgCanvas.height/2,0,starBgCanvas.width/2,starBgCanvas.height/2,starBgCanvas.width*.7);
+    grd.addColorStop(0,'#0a0022');grd.addColorStop(1,'#000010');
+    starBgCtx.fillStyle=grd;starBgCtx.fillRect(0,0,starBgCanvas.width,starBgCanvas.height);
+    bgStars.forEach(s=>{
+      s.a+=s.da;if(s.a<.1||s.a>1)s.da*=-1;
+      starBgCtx.beginPath();starBgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      starBgCtx.fillStyle=`rgba(255,240,180,${s.a})`;starBgCtx.fill();
+    });
+    // sparkle particles
+    starParticles=starParticles.filter(p=>p.life>0);
+    starCtx.clearRect(0,0,starCanvas.width,starCanvas.height);
+    drawStarScene();
+    starParticles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.life-=2;p.vy+=.05;
+      starCtx.beginPath();starCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      starCtx.fillStyle=`rgba(255,220,100,${p.life/100})`;starCtx.fill();
+    });
+    starAnimId=requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function drawStarScene(){
+  const ctx=starCtx;const W=starCanvas.width,H=starCanvas.height;
+  // draw connection lines
+  starLines.forEach((line,idx)=>{
+    const alpha=Math.min(1,(Date.now()-line.t)/400);
+    ctx.save();
+    ctx.strokeStyle=`rgba(255,200,80,${alpha*.8})`;
+    ctx.lineWidth=1.5;ctx.shadowColor='#ffe066';ctx.shadowBlur=6;
+    ctx.beginPath();ctx.moveTo(line.x1,line.y1);ctx.lineTo(line.x2,line.y2);ctx.stroke();
+    ctx.restore();
+  });
+  // draw stars
+  starPoints.forEach(pt=>{
+    const lit=pt.lit;
+    const isNext=pt.num===S.starNext+1;
+    ctx.save();
+    if(lit){
+      // glowing gold
+      ctx.shadowColor='#ffe066';ctx.shadowBlur=18;
+      ctx.fillStyle='#ffe066';
+      ctx.beginPath();drawStar5(ctx,pt.x,pt.y,10,5);ctx.fill();
+    } else if(isNext){
+      // pulsing hint
+      const pulse=.6+.4*Math.sin(Date.now()*.004);
+      ctx.shadowColor='#ff88cc';ctx.shadowBlur=14*pulse;
+      ctx.fillStyle=`rgba(255,160,200,${.7+.3*pulse})`;
+      ctx.beginPath();drawStar5(ctx,pt.x,pt.y,8,4);ctx.fill();
+    } else {
+      ctx.fillStyle='rgba(180,160,220,.55)';
+      ctx.beginPath();ctx.arc(pt.x,pt.y,5,0,Math.PI*2);ctx.fill();
+    }
+    // number label
+    ctx.fillStyle=lit?'#ffe066':(isNext?'#ff88cc':'rgba(200,180,240,.7)');
+    ctx.font=`bold ${lit?11:10}px sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(pt.num,pt.x,pt.y-16);
+    ctx.restore();
+  });
+}
+
+function drawStar5(ctx,cx,cy,outerR,innerR){
+  for(let i=0;i<10;i++){
+    const r=i%2===0?outerR:innerR;
+    const a=(i*Math.PI/5)-Math.PI/2;
+    i===0?ctx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+  }
+  ctx.closePath();
+}
+
+function onStarClick(e){
+  const rect=starCanvas.getBoundingClientRect();
+  const sx=starCanvas.width/rect.width;
+  const x=(e.clientX-rect.left)*sx,y=(e.clientY-rect.top)*sx;
+  handleStarHit(x,y);
+}
+function onStarTouch(e){
+  const rect=starCanvas.getBoundingClientRect();
+  const sx=starCanvas.width/rect.width;
+  const t=e.touches[0];
+  const x=(t.clientX-rect.left)*sx,y=(t.clientY-rect.top)*sx;
+  handleStarHit(x,y);
+}
+function handleStarHit(x,y){
+  if(S.starDone)return;
+  const next=starPoints.find(p=>p.num===S.starNext+1);
+  if(!next)return;
+  const dist=Math.hypot(x-next.x,y-next.y);
+  if(dist<28){
+    // correct!
+    const prev=S.starNext>0?starPoints[S.starNext-1]:null;
+    if(prev){
+      starLines.push({x1:prev.x,y1:prev.y,x2:next.x,y2:next.y,t:Date.now()});
+    }
+    next.lit=true;S.starNext++;
+    // sparkles
+    for(let i=0;i<12;i++){
+      const a=Math.random()*Math.PI*2;
+      starParticles.push({x:next.x,y:next.y,vx:Math.cos(a)*2,vy:Math.sin(a)*2-.5,
+        r:1.5+Math.random()*2,life:80+Math.random()*30});
+    }
+    document.getElementById('star-progress').textContent=S.starNext+' / 12 연결됨';
+    if(S.starNext>=12){
+      S.starDone=true;
+      // connect last to first to close heart
+      const first=starPoints[0],last=starPoints[11];
+      starLines.push({x1:last.x,y1:last.y,x2:first.x,y2:first.y,t:Date.now()});
+      document.getElementById('star-msg').textContent='🌟 우리만의 우주가 만들어졌어 ✨';
+      document.getElementById('star-progress').textContent='★ 별자리 완성! ★';
+      launchBalloons();
+      setTimeout(()=>document.getElementById('btn-star-next').style.display='block',1200);
+    } else {
+      document.getElementById('star-msg').textContent='✨ 다음 별: '+( S.starNext+1);
+    }
+  } else {
+    // miss
+    document.getElementById('star-msg').textContent='👆 '+( S.starNext+1)+'번 별을 찾아봐!';
+  }
+}
+document.getElementById('btn-star-next').addEventListener('click',()=>{
+  if(starAnimId)cancelAnimationFrame(starAnimId);
+  starCanvas.removeEventListener('click',onStarClick);
+  starCanvas.removeEventListener('touchstart',onStarTouch);
+  initThread();goStage('s9');
+});
+
+/* ════════════════ S9: RED THREAD ════════════════ */
+const DECOYS=['🧶','🪡','🪢','〰️','🎀','🎗️','🔴','💜','🩷','🔮','💎','🌀'];
+function initThread(){
+  S.threadTries=7;S.threadFound=false;S.threadLocked=false;
+  document.getElementById('thread-tries').textContent=7;
+  document.getElementById('thread-hint').textContent='\u00a0';
+  document.getElementById('btn-thread-retry').style.display='none';
+  document.getElementById('btn-thread-next').style.display='none';
+  buildThreadArena();
+}
+function buildThreadArena(){
+  const arena=document.getElementById('thread-arena');arena.innerHTML='';
+  const total=9,realIdx=Math.floor(Math.random()*total);
+  for(let i=0;i<total;i++){
+    const el=document.createElement('div');el.className='thread-item';
+    const isReal=(i===realIdx);
+    el.textContent=isReal?'🧵':DECOYS[Math.floor(Math.random()*DECOYS.length)];
+    if(isReal)el.classList.add('thread-real');
+    el.style.left=Math.floor(5+Math.random()*80)+'%';
+    el.style.top=Math.floor(6+Math.random()*76)+'%';
+    el.style.animationDuration=(1.8+Math.random()*2.5)+'s';
+    el.style.animationDelay=(Math.random()*2)+'s';
+    el.dataset.real=isReal?'1':'0';
+    el.addEventListener('click',()=>onThreadClick(el,arena));
+    arena.appendChild(el);
+  }
+}
+function onThreadClick(el,arena){
+  if(S.threadLocked||S.threadFound)return;
+  if(el.dataset.real==='1'){
+    S.threadFound=true;
+    el.style.animation='none';el.style.fontSize='3rem';
+    el.style.filter='drop-shadow(0 0 28px rgba(255,0,200,1))';
+    const dirs=[[-35,-45],[35,-45],[-45,0],[45,0],[-35,45],[35,45]];
+    dirs.forEach((d,k)=>{
+      const sp=document.createElement('div');sp.className='thread-spark';
+      sp.textContent=['✨','💫','🌟','💖'][k%4];
+      sp.style.cssText=`left:${el.style.left};top:${el.style.top};--dx:${d[0]}px;--dy:${d[1]}px;animation-delay:${k*0.07}s`;
+      arena.appendChild(sp);
+    });
+    document.getElementById('thread-hint').textContent='🌹 찾았어... 이 실이 우리를 이어줘';
+    setTimeout(()=>document.getElementById('btn-thread-next').style.display='block',900);
+  } else {
+    S.threadLocked=true;
+    flashScreen('#220033',160);
+    el.style.opacity='.12';el.style.pointerEvents='none';
+    S.threadTries--;document.getElementById('thread-tries').textContent=S.threadTries;
+    arena.style.transform='translateX(-5px)';
+    setTimeout(()=>{arena.style.transform='';},200);
+    document.getElementById('thread-hint').textContent='❌ 아니야... 진짜는 하나뿐이야';
+    if(S.threadTries<=0){
+      document.getElementById('thread-hint').textContent='💀 실이 끊어졌어...';
+      document.getElementById('btn-thread-retry').style.display='block';
+    } else {
+      setTimeout(()=>{
+        S.threadLocked=false;
+        document.querySelectorAll('#thread-arena .thread-item').forEach(t=>{
+          if(t.style.opacity!=='.12'){
+            t.style.left=Math.floor(5+Math.random()*80)+'%';
+            t.style.top=Math.floor(6+Math.random()*76)+'%';
+          }
+        });
+        if(S.threadTries<=3)document.getElementById('thread-hint').textContent='⚠️ 기회가 얼마 남지 않았어...';
+      },500);
+    }
+  }
+}
+document.getElementById('btn-thread-retry').addEventListener('click',initThread);
+document.getElementById('btn-thread-next').addEventListener('click',()=>{initProposal();goStage('s10');});
+
+/* ════════════════ S10: PROPOSAL ════════════════ */
+function initProposal(){
+  S.noEscapes=0;
+  const nb=document.getElementById('no-btn');
+  nb.style.top='50%';nb.style.left='55%';
+  document.getElementById('no-escape-msg').textContent='\u00a0';
+}
+const NO_MSGS=['어디 가려고 ㅋㅋ','이리와~','거의 잡힌다?','포기하는 게 낫겠어~','NO는 없어!','ㅋㅋㅋ 마지막 기회야!'];
+function runAwayNo(){
+  const arena=document.getElementById('proposal-arena');
+  const aw=arena.offsetWidth,ah=arena.offsetHeight;
+  const nb=document.getElementById('no-btn');
+  const bw=nb.offsetWidth||110,bh=nb.offsetHeight||44;
+  nb.style.left=Math.floor(Math.random()*(aw-bw))+'px';
+  nb.style.top=Math.floor(Math.random()*(ah-bh))+'px';
+  S.noEscapes++;
+  document.getElementById('no-escape-msg').textContent=NO_MSGS[Math.min(S.noEscapes-1,NO_MSGS.length-1)];
+}
+document.getElementById('no-btn').addEventListener('mouseenter',runAwayNo);
+document.getElementById('no-btn').addEventListener('touchstart',runAwayNo,{passive:true});
+document.getElementById('yes-btn').addEventListener('click',()=>{
+  launchBalloons();tryLoadImg('img-final','final.jpg');goStage('s11');
+});
+
+/* ════════════════ S11: RESTART ════════════════ */
+document.getElementById('btn-restart').addEventListener('click',()=>{
+  loadDone=false;
+  if(starAnimId)cancelAnimationFrame(starAnimId);
+  clearInterval(monsterInterval);candleIntervals.forEach(clearInterval);
+  const sb=document.getElementById('btn-s0-start');sb.disabled=false;sb.style.opacity='1';
+  document.getElementById('btn-s0-enter').style.display='none';
+  document.getElementById('load-wrap').style.display='none';
+  document.getElementById('load-bar').style.width='0%';
+  audL.pause();audL.currentTime=0;audS.pause();audS.currentTime=0;
+  document.body.classList.remove('love-mode');
+  goStage('s0');
+});
+
+/* INIT */
+drawWheel(0);
+</script>
+</body>
+</html>
