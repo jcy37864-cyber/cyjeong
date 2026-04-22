@@ -835,36 +835,32 @@ document.getElementById('btn-restart').addEventListener('click',()=>{
 
 /* INIT */
 drawWheel(0);
-</script>
-  const finalLines = [
-    "처음에는 그냥",
-    "평범한 사람이었어",
+<script>
+const finalLines = [
+  "처음에는 그냥",
+  "평범한 사람이었어",
+  "근데 어느 순간부터",
+  "너랑 대화하는 순간들이",
+  "제일 좋고 편해졌어",
+  "그래서 말하고 싶어",
+  "나는",
+  "너를 좋아해",
+  "앞으로도",
+  "지금처럼",
+  "같이 함께 웃고 싶어"
+];
 
-    "근데 어느 순간부터",
-    "너랑 대화하는 순간들이이",
-    "제일 좋고 편해졌어",
+let finalIndex = 0;
 
-    "그래서 말하고 싶어",
-
-    "나는",
-    "너를 좋아해",
-
-    "앞으로도",
-    "지금처럼",
-
-    "같이 함께 웃고 싶어"
-  ];
-
-  let finalIndex = 0;
-
-  function nextFinal(){
-    if(finalIndex < finalLines.length){
-      const el = document.getElementById("final-text");
-      el.innerHTML += finalLines[finalIndex] + "<br>";
-      finalIndex++;
-    } else {
-      document.getElementById("final-text").innerHTML += "<br>나랑 계속 같이 있을래?";
-    }
+function nextFinal(){
+  if(finalIndex < finalLines.length){
+    const el = document.getElementById("final-text");
+    el.innerHTML += finalLines[finalIndex] + "<br>";
+    finalIndex++;
+  } else {
+    document.getElementById("final-text").innerHTML += "<br>나랑 계속 같이 있을래?";
   }
+}
+</script>
 </body>
 </html>
