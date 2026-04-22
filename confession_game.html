@@ -268,7 +268,7 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 <!-- S5: 하트 그리드 -->
 <div class="stage" id="s5">
   <div class="title-love" style="font-size:1.5rem">내 마음을 받아줘! 💖</div>
-  <div id="heart-num-big"><span id="heart-num">0</span> / 12</div>
+  <div id="heart-num-big"><span id="heart-num">0</span> / 6</div>
   <div class="prog-wrap love"><div class="prog-bar" id="heart-bar" style="width:0%"></div></div>
   <div class="heart-grid" id="heart-grid"></div>
   <button class="btn btn-love" id="btn-to-thread" style="display:none">🧵 운명의 붉은 실을 찾아...</button>
@@ -343,7 +343,8 @@ function switchAudio(t){
 /* ═══════════════════ UTILS ═══════════════════ */
 function goStage(id){
   document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const el=document.getElementById(id);
+  if(el) el.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(['s4','s5','s6','s7','s8'].includes(id)){document.body.classList.add('love-mode');switchAudio('love');}
   else if(id!=='s0'){document.body.classList.remove('love-mode');switchAudio('scary');}
@@ -471,6 +472,8 @@ function buildDoors(){
 function rotateShadow(){document.getElementById('shadow-creature').textContent=CREATURES[Math.floor(Math.random()*CREATURES.length)];}
 function onDoorClick(d){
   if(d.dataset.used==='1')return;d.dataset.used='1';
+  /* 클릭 후 전체 카드 비활성화(중복 클릭 방지) */
+  document.querySelectorAll('.door-card').forEach(c=>c.dataset.used='1');
   if(d.dataset.safe==='1'){
     d.classList.add('correct');S.doorStreak++;
     document.getElementById('streak-num').textContent=S.doorStreak;
@@ -480,8 +483,9 @@ function onDoorClick(d){
   } else {
     d.classList.add('wrong');flashScreen('#ff0000',160);S.doorStreak=0;
     document.getElementById('streak-num').textContent=0;
+    /* HP 감소: 현재 HP-1 위치의 하트를 잃음 (0-indexed: hp2→hp1→hp0 순) */
     S.doorHP--;
-    const hEl = document.getElementById('hp'+(S.doorHP));
+    const hEl = document.getElementById('hp'+S.doorHP);
     if(hEl){ hEl.classList.add('lost'); hEl.textContent='🖤'; }
     if(S.doorHP<=0){
       document.getElementById('door-grid').style.display='none';
@@ -587,32 +591,60 @@ document.getElementById('roulette-spin-btn').addEventListener('click', function(
 document.getElementById('btn-to-trust').addEventListener('click',()=>{initTrust();goStage('s3');});
 
 /* ═══════════════════ S3: TRUST TYPING ═══════════════════ */
-const TPHRASES=['믿어','같이가자','영원히'];
+/* 난이도 하향: 2글자 짧은 단어, 오답 시 value 강제 초기화 대신 blur→focus 방식으로 IME 버그 해결 */
+const TPHRASES=['나','좋아','함께'];   // 짧고 명확한 단어
+let S3_composing = false;              // IME 조합 중 플래그
+
 function initTrust(){
   S.trustDone=0;S.trustIdx=0;
-  document.getElementById('trust-input').value='';
+  const inp=document.getElementById('trust-input');
+  inp.value='';
+  inp.disabled=false;
   document.getElementById('trust-msg').textContent='1 / 3 완료';
   document.getElementById('trust-err-msg').textContent='\u00a0';
   for(let i=0;i<3;i++) document.getElementById('td'+i).className='trust-dot';
   showTrustPhrase();
 }
 function showTrustPhrase(){
-  document.getElementById('trust-phrase').textContent='→ "'+TPHRASES[S.trustIdx]+'" 을 입력해봐';
-  document.getElementById('trust-input').value='';
-  document.getElementById('trust-input').focus();
+  const inp=document.getElementById('trust-input');
+  document.getElementById('trust-phrase').textContent='→ "'+TPHRASES[S.trustIdx]+'" 를 입력해봐';
+  /* IME 버그 해결: blur 후 value 초기화 → 재focus로 조합 버퍼 완전 리셋 */
+  inp.blur();
+  inp.value='';
+  document.getElementById('trust-err-msg').textContent='\u00a0';
+  setTimeout(()=>inp.focus(), 80);
 }
+
+/* IME 조합 중 플래그 관리 */
+document.getElementById('trust-input').addEventListener('compositionstart', ()=>{ S3_composing=true; });
+document.getElementById('trust-input').addEventListener('compositionend',   ()=>{ S3_composing=false; });
+
 document.getElementById('trust-input').addEventListener('input',function(){
-  const tgt=TPHRASES[S.trustIdx];
-  if(this.value===tgt){
+  /* IME 조합 중일 때는 판정 보류 */
+  if(S3_composing) return;
+  const tgt = TPHRASES[S.trustIdx];
+  const val  = this.value;
+
+  if(val === tgt){
+    /* 정답 */
     document.getElementById('td'+S.trustDone).classList.add('done');
-    S.trustDone++;S.trustIdx++;
-    document.getElementById('trust-msg').textContent=S.trustDone+' / 3 완료';
-    document.getElementById('trust-err-msg').textContent='\u00a0';
-    if(S.trustDone>=3){setTimeout(()=>{launchBalloons();tryLoadImg('img-cute','cute.jpg');goStage('s4');},400);}
-    else{showTrustPhrase();}
-  } else if(!tgt.startsWith(this.value)){
+    S.trustDone++; S.trustIdx++;
+    document.getElementById('trust-msg').textContent = S.trustDone+' / 3 완료';
+    document.getElementById('trust-err-msg').textContent = '\u00a0';
+    if(S.trustDone>=3){
+      this.disabled=true;
+      setTimeout(()=>{launchBalloons();tryLoadImg('img-cute','cute.jpg');goStage('s4');},400);
+    } else {
+      showTrustPhrase();
+    }
+  } else if(val.length > 0 && !tgt.startsWith(val)){
+    /* 오답: IME 안전하게 초기화 */
     document.getElementById('trust-err-msg').textContent='❌ 틀렸어! 다시 입력해봐';
-    flashScreen('#220000',100);this.value='';
+    flashScreen('#220000',100);
+    /* blur → clear → focus: 한국어 IME 조합 버퍼를 완전히 flush */
+    this.blur();
+    this.value='';
+    setTimeout(()=>this.focus(), 80);
   }
 });
 
@@ -628,8 +660,10 @@ function initHearts(){
 }
 function buildHeartGrid(){
   const g=document.getElementById('heart-grid');g.innerHTML='';g.style.pointerEvents='auto';g.style.opacity='1';
-  const total=16,positions=new Set();
-  while(positions.size<2) positions.add(Math.floor(Math.random()*total));
+  /* 난이도 하향: 16칸 중 실제 하트 3개, 목표 6개 (기존 2개/12목표 → 3개/6목표) */
+  const total=16, heartCount=3;
+  const positions=new Set();
+  while(positions.size<heartCount) positions.add(Math.floor(Math.random()*total));
   for(let i=0;i<total;i++){
     const c=document.createElement('div');c.className='heart-cell';
     c.textContent=positions.has(i)?'💖':'🤍';
@@ -641,8 +675,8 @@ function onHeartClick(c,isH){
   if(isH){
     c.classList.add('glow');S.heartCount++;
     document.getElementById('heart-num').textContent=S.heartCount;
-    document.getElementById('heart-bar').style.width=(S.heartCount/12*100)+'%';
-    if(S.heartCount>=12){
+    document.getElementById('heart-bar').style.width=(S.heartCount/6*100)+'%';
+    if(S.heartCount>=6){
       document.getElementById('btn-to-thread').style.display='block';
       document.getElementById('heart-grid').style.pointerEvents='none';
       document.getElementById('heart-grid').style.opacity='.35';
@@ -657,8 +691,9 @@ document.getElementById('btn-to-thread').addEventListener('click',()=>{initThrea
 /* ═══════════════════ S6: RED THREAD ═══════════════════ */
 const DECOYS=['🧶','🪡','🪢','〰️','🎀','🎗️','🔴','💜','🩷','🔮'];
 function initThread(){
-  S.threadTries=5;S.threadFound=false;S.threadLocked=false;
-  document.getElementById('thread-tries').textContent=5;
+  /* 난이도 하향: 기회 5→8회, 실 총 개수 11→9개(찾기 쉽게) */
+  S.threadTries=8;S.threadFound=false;S.threadLocked=false;
+  document.getElementById('thread-tries').textContent=8;
   document.getElementById('thread-hint').textContent='\u00a0';
   document.getElementById('btn-thread-retry').style.display='none';
   document.getElementById('btn-thread-next').style.display='none';
@@ -666,7 +701,8 @@ function initThread(){
 }
 function buildThreadArena(){
   const arena=document.getElementById('thread-arena');arena.innerHTML='';
-  const total=11,realIdx=Math.floor(Math.random()*total);
+  /* 난이도 하향: 전체 9개로 줄이고 진짜 실은 1개 유지 (총 개수 감소로 찾기 쉬움) */
+  const total=9,realIdx=Math.floor(Math.random()*total);
   for(let i=0;i<total;i++){
     const el=document.createElement('div');el.className='thread-item';
     const isReal=(i===realIdx);
@@ -716,7 +752,7 @@ function onThreadClick(el,arena){
             t.style.top=Math.floor(5+Math.random()*78)+'%';
           }
         });
-        if(S.threadTries<=2) document.getElementById('thread-hint').textContent='⚠️ 기회가 얼마 안 남았어!';
+        if(S.threadTries<=3) document.getElementById('thread-hint').textContent='⚠️ 기회가 얼마 안 남았어!';
       },500);
     }
   }
@@ -750,6 +786,9 @@ document.getElementById('yes-btn').addEventListener('click',()=>{launchBalloons(
 /* ═══════════════════ S8: RESTART ═══════════════════ */
 document.getElementById('btn-restart').addEventListener('click',()=>{
   loadDone=false;
+  S3_composing=false;
+  const inp=document.getElementById('trust-input');
+  inp.disabled=false; inp.value='';
   const sb=document.getElementById('btn-s0-start');sb.disabled=false;sb.style.opacity='1';
   document.getElementById('btn-s0-enter').style.display='none';
   document.getElementById('load-wrap').style.display='none';
