@@ -245,19 +245,20 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 
 <!-- S3: 믿음 타이핑 -->
 <div class="stage" id="s3">
-  <div class="title-horror" style="font-size:1.35rem">소연아, 날 진짜 믿는다면...</div>
-  <div class="subtitle" style="color:#553333">아래 글자를 정확히 입력해봐.</div>
-  <div id="trust-phrase"></div>
-  <input id="trust-input" type="text" autocomplete="off" spellcheck="false" placeholder="여기에 입력...">
-  <div id="trust-progress-wrap">
-    <div class="trust-dot" id="td0"></div>
-    <div class="trust-dot" id="td1"></div>
-    <div class="trust-dot" id="td2"></div>
+    <div class="title-horror" style="font-size:1.3rem;">소연아, 날 믿어?</div>
+    <div class="subtitle">순서대로 단어를 눌러봐</div>
+    <div id="trust-phrase" style="font-family:var(--font-main);font-size:1.8rem;text-align:center;color:#ff2222;margin:1rem 0;">"나 좋아 함께"</div>
+    
+    <div id="trust-btn-zone" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+      <button class="btn btn-horror" onclick="checkBtn('나')">나</button>
+      <button class="btn btn-horror" onclick="checkBtn('좋아')">좋아</button>
+      <button class="btn btn-horror" onclick="checkBtn('함께')">함께</button>
+    </div>
+    
+    <div id="trust-msg" style="text-align:center; font-size:0.9rem; color:#666; margin-top:10px;">1 / 3 완료 대기 중</div>
+    <div id="trust-err-msg" style="text-align:center; color:#ff4444; font-size:0.85rem; min-height:1.2em;">&nbsp;</div>
   </div>
-  <div id="trust-msg">1 / 3 완료</div>
-  <div id="trust-err-msg">&nbsp;</div>
-</div>
-
+  
 <!-- S4: 반전 고백 -->
 <div class="stage" id="s4">
   <div class="title-love">🌹 서프라이즈! 소연아! 🌹</div>
@@ -596,92 +597,46 @@ document.getElementById('btn-to-trust').addEventListener('click',()=>{initTrust(
 const TPHRASES=['나','좋아','함께']; 
 let S3_composing = false; 
 
-function initTrust(){
-  S.trustDone=0; S.trustIdx=0;
-  const inp=document.getElementById('trust-input');
-  inp.value='';
-  inp.disabled=false;
-  document.getElementById('trust-msg').textContent='1 / 3 완료';
-  document.getElementById('trust-err-msg').textContent='\u00a0';
-  // 점 표시(dot) 초기화
-  for(let i=0;i<3;i++) {
-    const dot = document.getElementById('td'+i);
-    if(dot) dot.className='trust-dot';
-  }
-  showTrustPhrase();
+/* S3 기능을 버튼 방식으로 완전히 새로 정의 */
+let currentOrder = 0;
+const T_ORDER = ['나', '좋아', '함께'];
+
+function initTrust() {
+  currentOrder = 0;
+  document.getElementById('trust-msg').textContent = '순서대로 눌러줘';
+  document.getElementById('trust-btn-zone').style.pointerEvents = 'auto';
 }
 
-function showTrustPhrase(){
-  const inp = document.getElementById('trust-input');
-  document.getElementById('trust-phrase').textContent = '→ "' + TPHRASES[S.trustIdx] + '" 를 입력해봐';
-  
-  // 입력창 초기화 및 강제 포커스 (IME 버퍼 리셋)
-  inp.value = '';
-  document.getElementById('trust-err-msg').textContent = '\u00a0';
-  setTimeout(() => {
-    inp.blur();
-    inp.focus();
-  }, 100);
-}
+function checkBtn(clickedVal) {
+  const target = T_ORDER[currentOrder];
 
-const trustInput = document.getElementById('trust-input');
-
-// 한글 조합 시작/끝 감지
-trustInput.addEventListener('compositionstart', () => { S3_composing = true; });
-trustInput.addEventListener('compositionend', (e) => { 
-  S3_composing = false; 
-  // 조합이 끝나는 순간(엔터나 공백 등) 즉시 판정 실행
-  checkS3Typing(e.target); 
-});
-
-// 글자 입력 시마다 실행
-trustInput.addEventListener('input', (e) => {
-  // 조합 중(한글 받침 입력 등)일 때는 판정을 잠시 멈춤
-  if (!S3_composing) {
-    checkS3Typing(e.target);
-  }
-});
-
-function checkS3Typing(el) {
-  const tgt = TPHRASES[S.trustIdx];
-  const val = el.value.trim();
-
-  if (val === tgt) {
-    /* 정답 처리 */
-    const dot = document.getElementById('td' + S.trustDone);
-    if(dot) dot.classList.add('done');
+  if (clickedVal === target) {
+    // 맞았을 때
+    if(typeof flashScreen === 'function') flashScreen('#002200', 100); 
+    currentOrder++;
+    document.getElementById('trust-msg').textContent = currentOrder + ' / 3 성공!';
     
-    S.trustDone++; 
-    S.trustIdx++;
-    document.getElementById('trust-msg').textContent = S.trustDone + ' / 3 완료';
-    document.getElementById('trust-err-msg').textContent = '\u00a0';
-
-    if (S.trustDone >= 3) {
-      el.disabled = true;
-      el.blur();
+    if (currentOrder >= 3) {
+      document.getElementById('trust-btn-zone').style.pointerEvents = 'none';
       setTimeout(() => {
-        launchBalloons();
-        tryLoadImg('img-cute', 'cute.jpg');
+        if(typeof launchBalloons === 'function') launchBalloons();
+        if(typeof tryLoadImg === 'function') tryLoadImg('img-cute', 'cute.jpg');
         goStage('s4');
-      }, 400);
-    } else {
-      showTrustPhrase();
+        // 소리 조절
+        const scaryAud = document.getElementById('aud-scary');
+        const loveAud = document.getElementById('aud-love');
+        if(scaryAud) scaryAud.pause();
+        if(loveAud) loveAud.play().catch(()=>{});
+      }, 500);
     }
-  } else if (val.length > 0 && !tgt.startsWith(val)) {
-    /* 오답 처리: IME 버퍼를 강제로 비우기 위해 blur 후 focus */
-    document.getElementById('trust-err-msg').textContent = '❌ 틀렸어! 다시 입력해봐';
-    if (typeof flashScreen === 'function') flashScreen('#220000', 100);
-    
-    el.value = '';
-    el.blur();
-    setTimeout(() => el.focus(), 100);
+  } else {
+    // 틀렸을 때
+    if(typeof flashScreen === 'function') flashScreen('#220000', 100);
+    alert("순서가 틀렸어! 처음부터 다시 눌러봐.");
+    currentOrder = 0;
+    document.getElementById('trust-msg').textContent = '다시 처음부터 눌러줘';
   }
 }
-
-document.getElementById('btn-to-heart').addEventListener('click', () => {
-  if (typeof initHearts === 'function') initHearts();
-  goStage('s5');
-});
 
 /* ═══════════════════ S5: HEART GRID ═══════════════════ */
 function initHearts(){
@@ -819,8 +774,6 @@ document.getElementById('yes-btn').addEventListener('click',()=>{launchBalloons(
 /* ═══════════════════ S8: RESTART ═══════════════════ */
 document.getElementById('btn-restart').addEventListener('click',()=>{
   loadDone=false;
-  S3_composing=false;
-  const inp=document.getElementById('trust-input');
   inp.disabled=false; inp.value='';
   const sb=document.getElementById('btn-s0-start');sb.disabled=false;sb.style.opacity='1';
   document.getElementById('btn-s0-enter').style.display='none';
