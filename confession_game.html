@@ -247,6 +247,47 @@ body.love-mode .narration{color:#a07888;}
 .ending-final{border:1px solid rgba(255,110,180,.4);background:rgba(255,110,180,.06);
   border-radius:12px;padding:1.2rem;text-align:center;font-size:1rem;line-height:2;
   color:var(--l-text);}
+
+/* 1. 글자들이 부드럽게 나타나는 애니메이션 정의 */
+@keyframes softAppear {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); /* 살짝 아래에서 위로 올라오는 느낌 */
+    filter: blur(5px);           /* 처음엔 흐릿하게 */
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+    filter: blur(0); 
+  }
+}
+
+/* 2. 첫 번째 문구 설정 */
+.fade-text {
+  font-size: 1.1rem;
+  color: #ffb7c5;
+  opacity: 0; /* 처음엔 숨김 */
+  margin-bottom: 10px;
+}
+
+/* 3. 두 번째 메인 문구 설정 */
+.fade-text-main {
+  font-size: 1.6rem;
+  color: #ff4d6d;
+  font-weight: bold;
+  opacity: 0; /* 처음엔 숨김 */
+}
+
+/* 4. 애니메이션 실행 클래스 (자바스크립트가 이걸 붙여줄 거예요) */
+.start-fade .fade-text {
+  animation: softAppear 2s ease-in forwards;
+  animation-delay: 0.5s; /* 0.5초 뒤 등장 */
+}
+
+.start-fade .fade-text-main {
+  animation: softAppear 2s ease-in forwards;
+  animation-delay: 2.5s; /* 첫 문구 나오고 2초 뒤 등장 */
+}  
 </style>
 </head>
 <body>
@@ -398,13 +439,21 @@ body.love-mode .narration{color:#a07888;}
 
 <!-- ━━━ S11: 엔딩 ━━━ -->
 <div class="stage" id="s11">
-  <div class="title-love">🎉축복, 너와의 출발🎉</div>
-  <div class="img-box love-frame" id="img-final"><div class="img-ph" style="background:rgba(255,110,180,.05);color:#ff6eb4"><div class="ic">💑</div><div>final.jpg</div></div></div>
-  <div class="ending-text">공포도, 어둠도, 모든 게 다<br>너를 향한 무대였어, 소연아</div>
-  <div class="ending-final">
-    君と出会えて, 本当によかった。<br>
-    <span style="font-size:1.2rem;color:var(--l-accent)">ずっと一緒にいてくれる？💖</span>
+  <div class="title-love">🎉 축복, 너와의 출발</div>
+  
+  <div class="img-box love-frame" id="img-final-wrap">
+    <img id="img-final" src="" style="width:100%; border-radius:15px;">
   </div>
+
+  <div class="ending-text fade-text">
+    공포도, 어둠도, 모든 게 다<br>너를 향한 무대였어, 소연아
+  </div>
+  
+  <div class="ending-final fade-text-main">
+    君と出会えて, 本当によかった。<br>
+    <span style="font-size:1.2rem; color:var(--l-accent)">ずっと一緒にいてくれる？💖</span>
+  </div>
+
   <button class="btn btn-love" id="btn-restart">🔄 처음부터</button>
 </div>
 
