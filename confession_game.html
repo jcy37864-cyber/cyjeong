@@ -1148,7 +1148,7 @@ function onThreadClick(el,arena){
       sp.style.cssText=`left:${el.style.left};top:${el.style.top};--dx:${d[0]}px;--dy:${d[1]}px;animation-delay:${k*0.07}s`;
       arena.appendChild(sp);
     });
-    document.getElementById('thread-hint').textContent='🌹 찾았어... 이 실이 우리를 이어줘';
+    document.getElementById('thread-hint').textContent='🌹 찾았어... 이 실이 우리를 이어줄거야';
     setTimeout(()=>document.getElementById('btn-thread-next').style.display='block',900);
   } else {
     S.threadLocked=true;
