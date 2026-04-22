@@ -853,12 +853,14 @@ const finalLines = [
 let finalIndex = 0;
 
 function nextFinal(){
+  const el = document.getElementById("final-text");
+  if(!el) return;  // ⭐ 이거 없으면 죽음
+
   if(finalIndex < finalLines.length){
-    const el = document.getElementById("final-text");
     el.innerHTML += finalLines[finalIndex] + "<br>";
     finalIndex++;
   } else {
-    document.getElementById("final-text").innerHTML += "<br>나랑 계속 같이 있을래?";
+    el.innerHTML += "<br>나랑 계속 같이 있을래?";
   }
 }
 </script>
