@@ -1089,7 +1089,7 @@ function handleStarHit(x,y){
       // connect last to first to close heart
       const first=starPoints[0],last=starPoints[11];
       starLines.push({x1:last.x,y1:last.y,x2:first.x,y2:first.y,t:Date.now()});
-      document.getElementById('star-msg').textContent='🌟 우리만의 우주가 만들어졌어 ✨';
+      document.getElementById('star-msg').textContent='🌟 니가 좋아하는 하늘의 빛나는 별✨✨';
       document.getElementById('star-progress').textContent='★ 별자리 완성! ★';
       launchBalloons();
       setTimeout(()=>document.getElementById('btn-star-next').style.display='block',1200);
