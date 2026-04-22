@@ -23,7 +23,7 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
   margin: 0 auto;   /* 중요: 좌우 여백을 똑같이 나눠서 중앙에 배치 */
   position: relative; 
   left: 0;          /* 혹시 left 값이 들어가 있다면 0으로 초기화 */
-  padding: 1rem;
+  padding: 0.5rem 0.8rem;
   overflow-x: hidden; /* 혹시라도 내용물이 삐져나와서 화면이 밀리는 걸 방지 */
 }
 
@@ -33,13 +33,13 @@ body.love-mode{background:var(--l-bg);color:var(--l-text);}
 @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* typography */
-.title-horror{font-family:var(--font-main);font-size:clamp(1.7rem,7vw,2.6rem);
+.title-horror{font-family:var(--font-main);font-size:clamp(1.4rem,7vw,2.6rem);
   color:var(--h-text);text-align:center;letter-spacing:.05em;
   text-shadow:0 0 30px rgba(255,34,34,.6);animation:flicker 3s infinite;}
 .title-love{font-family:var(--font-main);font-size:clamp(1.4rem,6vw,2.2rem);
   color:var(--l-accent);text-align:center;letter-spacing:.03em;
   text-shadow:0 0 20px rgba(255,110,180,.4);}
-.subtitle{font-size:.95rem;text-align:center;opacity:.82;line-height:1.75;}
+.subtitle{font-size:.85rem;text-align:center;opacity:.82;line-height:1.3;}
 .narration{font-size:.88rem;color:#886655;text-align:center;font-style:italic;line-height:1.7;padding:0 .5rem;}
 body.love-mode .narration{color:#a07888;}
 
@@ -171,9 +171,18 @@ body.love-mode .narration{color:#a07888;}
 #roulette-needle{position:absolute;top:-8px;left:50%;transform:translateX(-50%);
   width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
   border-bottom:30px solid #ffff00;filter:drop-shadow(0 0 4px rgba(255,255,0,.8));z-index:10;}
-#spin-result-ring{width:20px;height:20px;border-radius:30%;border:4px solid #330000;
-  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
-  margin:0 auto;transition:border-color .3s,background .3s;}
+#spin-result-ring {
+  width: 30px;         /* 20은 너무 작아서 글자가 깨질 수 있으니 50 정도 추천 */
+  height: 30px;        /* 가로세로 똑같이 */
+  border-radius: 50%;  /* 다시 완벽한 동그라미로 (20% -> 50%) */
+  border: 2px solid #330000; /* 선 두께를 4에서 2로 줄여서 내부 공간 확보 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;     /* 글자 크기 적당히 */
+  margin: 5px auto;    /* 위아래 여백을 5px로 최소화 */
+  transition: border-color .3s, background .3s;
+}
 
 /* ══ S5: TRUST BUTTONS ══ */
 .trust-btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
